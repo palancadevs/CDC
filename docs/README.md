@@ -58,12 +58,37 @@
 
 ---
 
+## Arquitectura del Sistema
+
+**IMPORTANTE:** Este es un sistema **frontend completo**, NO un plugin de wp-admin.
+
+- **Frontend:** Aplicación web completa en el sitio raíz (`http://localhost:10013/`)
+- **Backend:** WordPress + WooCommerce como REST API
+- **Autenticación:** Login custom (DNI como usuario)
+- **Acceso:** Sistema privado para uso interno exclusivamente
+
+### Estructura Técnica
+```
+/app/public/
+├── wp-content/
+│   ├── themes/
+│   │   └── cdc-sistema/        ← Tema custom (frontend completo)
+│   │       ├── assets/         ← CSS, JS, imágenes
+│   │       ├── templates/      ← Vistas del sistema
+│   │       ├── includes/       ← Lógica PHP
+│   │       └── functions.php   ← Setup del tema
+│   └── plugins/
+│       └── cdc-api/            ← REST API custom (backend)
+```
+
 ## Flujo de Desarrollo Recomendado
 
-### Fase 1: Setup Base (Épica E0)
-1. Instalar y configurar plugin base `cdc-admin`
-2. Crear estructura de menús y navegación lateral
-3. Implementar roles y permisos
+### Fase 1: Setup Base Frontend (Épica E0)
+1. Crear tema custom `cdc-sistema`
+2. Implementar login custom (DNI + contraseña)
+3. Crear layout base con sidebar de navegación
+4. Implementar sistema de roles y permisos
+5. Dashboard/Inicio con acciones rápidas
 
 ### Fase 2: Módulo Personas (Épica E2)
 1. Crear tabla `cdc_persona`
@@ -109,10 +134,10 @@
 ## Convenciones del Proyecto
 
 ### Nombres de Archivos y Clases
-- **Servicios**: `{Modulo}Service.php` (ej: `PersonasService.php`)
-- **Modelos**: `{Entidad}.php` (ej: `Persona.php`, `MovimientoCaja.php`)
-- **Admin Pages**: `{modulo}-page.php` (ej: `personas-page.php`)
-- **Templates**: `{modulo}-{accion}.php` (ej: `personas-listado.php`, `ficha-socio.php`)
+- **Servicios API**: `{Modulo}Service.php` (ej: `PersonasService.php`) - En plugin cdc-api
+- **Modelos**: `{Entidad}.php` (ej: `Persona.php`, `MovimientoCaja.php`) - En plugin cdc-api
+- **Templates Frontend**: `template-{modulo}.php` (ej: `template-personas.php`) - En tema
+- **Partials**: `partials/{componente}.php` (ej: `partials/sidebar.php`) - En tema
 
 ### Prefijos de Base de Datos
 - Todas las tablas custom: `cdc_*`
