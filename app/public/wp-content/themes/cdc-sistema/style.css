@@ -1,0 +1,18 @@
+/*
+Theme Name: CDC Sistema
+Theme URI: https://github.com/palancadevs/CDC
+Author: Palanca Devs
+Author URI: https://palancadevs.com
+Description: Sistema de gestión completo para Casa de la Cultura. Frontend personalizado con autenticación custom.
+Version: 1.0.0
+Requires at least: 6.8
+Tested up to: 6.8
+Requires PHP: 7.4
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: cdc-sistema
+Tags: custom-background, custom-logo, custom-menu, featured-images, threaded-comments, translation-ready
+*/
+
+/* Este tema usa un archivo CSS separado para estilos (assets/css/main.css) */
+/* Este archivo es requerido por WordPress para reconocer el tema */
