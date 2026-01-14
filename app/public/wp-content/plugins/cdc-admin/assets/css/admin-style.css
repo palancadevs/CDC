@@ -1,0 +1,442 @@
+/**
+ * CDC Admin Styles
+ *
+ * Main stylesheet for CDC administration pages
+ */
+
+/* ==========================================================================
+   Global Layout
+   ========================================================================== */
+
+.cdc-admin-wrap {
+    display: flex;
+    margin: -20px -20px -20px -22px;
+    min-height: 100vh;
+    background: #f0f0f1;
+}
+
+/* ==========================================================================
+   Sidebar Navigation
+   ========================================================================== */
+
+.cdc-sidebar {
+    width: 260px;
+    background: #23282d;
+    color: #fff;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.cdc-sidebar-header {
+    padding: 20px;
+    border-bottom: 1px solid #32373c;
+}
+
+.cdc-sidebar-header h2 {
+    color: #fff;
+    font-size: 18px;
+    margin: 0 0 5px 0;
+}
+
+.cdc-sidebar-subtitle {
+    color: #a7aaad;
+    font-size: 13px;
+    margin: 0;
+}
+
+.cdc-sidebar-nav {
+    flex: 1;
+    padding: 10px 0;
+}
+
+.cdc-sidebar-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    color: #a7aaad;
+    text-decoration: none;
+    transition: all 0.2s;
+    border-left: 3px solid transparent;
+}
+
+.cdc-sidebar-item:hover {
+    background: #32373c;
+    color: #00b9eb;
+    border-left-color: #00b9eb;
+}
+
+.cdc-sidebar-item.active {
+    background: #0073aa;
+    color: #fff;
+    border-left-color: #fff;
+}
+
+.cdc-sidebar-item .dashicons {
+    margin-right: 12px;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+}
+
+.cdc-sidebar-item-text {
+    font-size: 14px;
+}
+
+/* ==========================================================================
+   Main Content
+   ========================================================================== */
+
+.cdc-main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+}
+
+.cdc-admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    background: #fff;
+    border-bottom: 1px solid #dcdcde;
+}
+
+.cdc-admin-header h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.cdc-header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.cdc-user-role {
+    padding: 4px 12px;
+    background: #0073aa;
+    color: #fff;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.cdc-user-name {
+    color: #50575e;
+    font-size: 14px;
+}
+
+.cdc-content-body {
+    flex: 1;
+    padding: 30px;
+    overflow-y: auto;
+}
+
+/* ==========================================================================
+   Cards & Panels
+   ========================================================================== */
+
+.cdc-card {
+    background: #fff;
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.cdc-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.cdc-card-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.cdc-card-body {
+    font-size: 14px;
+}
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+
+.cdc-button {
+    display: inline-block;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
+    text-align: center;
+    text-decoration: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.cdc-button-primary {
+    background: #0073aa;
+    color: #fff;
+    border-color: #0073aa;
+}
+
+.cdc-button-primary:hover {
+    background: #005a87;
+    border-color: #005a87;
+    color: #fff;
+}
+
+.cdc-button-secondary {
+    background: #f0f0f1;
+    color: #2c3338;
+    border-color: #dcdcde;
+}
+
+.cdc-button-secondary:hover {
+    background: #dcdcde;
+    border-color: #c3c4c7;
+    color: #2c3338;
+}
+
+.cdc-button-danger {
+    background: #d63638;
+    color: #fff;
+    border-color: #d63638;
+}
+
+.cdc-button-danger:hover {
+    background: #b32d2e;
+    border-color: #b32d2e;
+    color: #fff;
+}
+
+.cdc-button-large {
+    padding: 80px 40px;
+    font-size: 18px;
+    min-width: 200px;
+}
+
+.cdc-button-icon {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ==========================================================================
+   Forms
+   ========================================================================== */
+
+.cdc-form-group {
+    margin-bottom: 20px;
+}
+
+.cdc-form-label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.cdc-form-label.required::after {
+    content: '*';
+    color: #d63638;
+    margin-left: 4px;
+}
+
+.cdc-form-control {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 14px;
+    line-height: 1.5;
+    border: 1px solid #8c8f94;
+    border-radius: 4px;
+}
+
+.cdc-form-control:focus {
+    border-color: #0073aa;
+    outline: none;
+    box-shadow: 0 0 0 1px #0073aa;
+}
+
+.cdc-form-help {
+    display: block;
+    margin-top: 6px;
+    font-size: 13px;
+    color: #646970;
+}
+
+.cdc-form-error {
+    display: block;
+    margin-top: 6px;
+    font-size: 13px;
+    color: #d63638;
+}
+
+/* ==========================================================================
+   Tables
+   ========================================================================== */
+
+.cdc-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+}
+
+.cdc-table thead {
+    background: #f6f7f7;
+}
+
+.cdc-table th {
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 14px;
+    border-bottom: 2px solid #dcdcde;
+}
+
+.cdc-table td {
+    padding: 12px;
+    font-size: 14px;
+    border-bottom: 1px solid #f0f0f1;
+}
+
+.cdc-table tbody tr:hover {
+    background: #f6f7f7;
+}
+
+.cdc-table-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* ==========================================================================
+   Badges
+   ========================================================================== */
+
+.badge {
+    display: inline-block;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    border-radius: 3px;
+}
+
+.badge-success {
+    background: #00a32a;
+    color: #fff;
+}
+
+.badge-warning {
+    background: #dba617;
+    color: #fff;
+}
+
+.badge-danger {
+    background: #d63638;
+    color: #fff;
+}
+
+.badge-info {
+    background: #0073aa;
+    color: #fff;
+}
+
+.badge-secondary {
+    background: #8c8f94;
+    color: #fff;
+}
+
+/* ==========================================================================
+   Utilities
+   ========================================================================== */
+
+.cdc-text-center {
+    text-align: center;
+}
+
+.cdc-text-right {
+    text-align: right;
+}
+
+.cdc-mb-0 {
+    margin-bottom: 0 !important;
+}
+
+.cdc-mb-1 {
+    margin-bottom: 10px !important;
+}
+
+.cdc-mb-2 {
+    margin-bottom: 20px !important;
+}
+
+.cdc-mb-3 {
+    margin-bottom: 30px !important;
+}
+
+.cdc-mt-0 {
+    margin-top: 0 !important;
+}
+
+.cdc-mt-1 {
+    margin-top: 10px !important;
+}
+
+.cdc-mt-2 {
+    margin-top: 20px !important;
+}
+
+.cdc-mt-3 {
+    margin-top: 30px !important;
+}
+
+.cdc-d-flex {
+    display: flex !important;
+}
+
+.cdc-align-items-center {
+    align-items: center !important;
+}
+
+.cdc-justify-content-between {
+    justify-content: space-between !important;
+}
+
+.cdc-gap-1 {
+    gap: 10px !important;
+}
+
+.cdc-gap-2 {
+    gap: 20px !important;
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media (max-width: 768px) {
+    .cdc-sidebar {
+        width: 200px;
+    }
+
+    .cdc-content-body {
+        padding: 20px;
+    }
+
+    .cdc-admin-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+}
