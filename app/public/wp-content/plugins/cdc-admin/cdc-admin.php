@@ -113,9 +113,10 @@ class CDC_Admin {
         // Admin Pages
         require_once CDC_PLUGIN_DIR . 'includes/admin-pages/menu.php';
         require_once CDC_PLUGIN_DIR . 'includes/admin-pages/inicio-page.php';
-        require_once CDC_PLUGIN_DIR . 'includes/admin-pages/personas-page.php';
-        require_once CDC_PLUGIN_DIR . 'includes/admin-pages/cobrar-page.php';
-        require_once CDC_PLUGIN_DIR . 'includes/admin-pages/caja-page.php';
+        // Additional pages will be loaded in future phases
+        // require_once CDC_PLUGIN_DIR . 'includes/admin-pages/personas-page.php';
+        // require_once CDC_PLUGIN_DIR . 'includes/admin-pages/cobrar-page.php';
+        // require_once CDC_PLUGIN_DIR . 'includes/admin-pages/caja-page.php';
     }
 
     /**
