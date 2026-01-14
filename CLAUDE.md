@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is "CDC Gestión" - a custom WordPress + WooCommerce-based management system for Casa de la Cultura (Cultural Center). The system handles members (socios), clients, workshops (talleres), events, room rentals (alquiler de salas), cash flow, and automatic invoicing through ARCA.
+This is "CDC Gestión" - a **custom frontend application** built on WordPress + WooCommerce for Casa de la Cultura (Cultural Center). The system handles members (socios), clients, workshops (talleres), events, room rentals (alquiler de salas), cash flow, and automatic invoicing through ARCA.
+
+**IMPORTANT:** This is a **frontend-only system** (NOT wp-admin). The entire public site is the management application.
 
 **Technology Stack:**
 - WordPress 6.8+ with WooCommerce 10.4.3
