@@ -1,0 +1,385 @@
+/**
+ * CDC Sistema - Main Styles
+ *
+ * @package CDC_Sistema
+ */
+
+/* ==========================================================================
+   Reset & Base
+   ========================================================================== */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #2c3338;
+    background: #f0f0f1;
+}
+
+/* ==========================================================================
+   App Layout
+   ========================================================================== */
+
+.cdc-app {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ==========================================================================
+   Sidebar
+   ========================================================================== */
+
+.cdc-sidebar {
+    width: 260px;
+    background: #23282d;
+    color: #fff;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 100;
+}
+
+.cdc-sidebar-header {
+    padding: 20px;
+    border-bottom: 1px solid #32373c;
+}
+
+.cdc-sidebar-header h2 {
+    color: #fff;
+    font-size: 18px;
+    margin: 0 0 5px 0;
+}
+
+.cdc-sidebar-header p {
+    color: #a7aaad;
+    font-size: 13px;
+    margin: 0;
+}
+
+.cdc-sidebar-nav {
+    flex: 1;
+    padding: 10px 0;
+    overflow-y: auto;
+}
+
+.cdc-sidebar-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    color: #a7aaad;
+    text-decoration: none;
+    transition: all 0.2s;
+    border-left: 3px solid transparent;
+}
+
+.cdc-sidebar-item:hover {
+    background: #32373c;
+    color: #00b9eb;
+    border-left-color: #00b9eb;
+}
+
+.cdc-sidebar-item.active {
+    background: #0073aa;
+    color: #fff;
+    border-left-color: #fff;
+}
+
+.cdc-sidebar-item .dashicons {
+    margin-right: 12px;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+}
+
+/* ==========================================================================
+   Main Content
+   ========================================================================== */
+
+.cdc-main {
+    flex: 1;
+    margin-left: 260px;
+    display: flex;
+    flex-direction: column;
+}
+
+.cdc-header {
+    background: #fff;
+    border-bottom: 1px solid #dcdcde;
+    padding: 20px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 90;
+}
+
+.cdc-page-title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.cdc-header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.cdc-user-role {
+    padding: 4px 12px;
+    background: #0073aa;
+    color: #fff;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.cdc-user-name {
+    color: #50575e;
+    font-size: 14px;
+}
+
+.cdc-logout {
+    color: #d63638;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.cdc-logout:hover {
+    text-decoration: underline;
+}
+
+.cdc-content {
+    flex: 1;
+    padding: 30px;
+}
+
+/* ==========================================================================
+   Cards
+   ========================================================================== */
+
+.cdc-card {
+    background: #fff;
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.cdc-card-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid #f0f0f1;
+}
+
+.cdc-card-title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.cdc-card-body {
+    padding: 20px;
+}
+
+.cdc-card-info {
+    background: #f0f6fc;
+    border-color: #0073aa;
+}
+
+.cdc-card-info h3 {
+    color: #0073aa;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 10px 0;
+}
+
+.cdc-card-info p {
+    margin: 8px 0;
+    color: #50575e;
+}
+
+/* ==========================================================================
+   Search Form
+   ========================================================================== */
+
+.cdc-search-form h3 {
+    margin: 0 0 15px 0;
+    font-size: 16px;
+}
+
+.cdc-search-wrapper {
+    display: flex;
+    gap: 10px;
+}
+
+.cdc-search-wrapper input {
+    flex: 1;
+}
+
+#cdc-search-results {
+    margin-top: 15px;
+    padding: 15px 0 0 0;
+    border-top: 1px solid #f0f0f1;
+}
+
+#cdc-search-results:empty {
+    display: none;
+}
+
+/* ==========================================================================
+   Quick Actions
+   ========================================================================== */
+
+.cdc-quick-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.cdc-action-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: all 0.2s;
+    min-height: 150px;
+}
+
+.cdc-action-card .dashicons {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 10px;
+}
+
+.cdc-action-card strong {
+    font-size: 16px;
+}
+
+.cdc-action-primary {
+    background: #0073aa;
+    color: #fff;
+}
+
+.cdc-action-primary:hover {
+    background: #005a87;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 115, 170, 0.3);
+}
+
+.cdc-action-secondary {
+    background: #f0f0f1;
+    color: #2c3338;
+}
+
+.cdc-action-secondary:hover {
+    background: #dcdcde;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* ==========================================================================
+   Form Controls
+   ========================================================================== */
+
+.cdc-form-control {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 14px;
+    line-height: 1.5;
+    border: 1px solid #8c8f94;
+    border-radius: 4px;
+    transition: border-color 0.2s;
+}
+
+.cdc-form-control:focus {
+    border-color: #0073aa;
+    outline: none;
+    box-shadow: 0 0 0 1px #0073aa;
+}
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+
+.cdc-button {
+    display: inline-block;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
+    text-align: center;
+    text-decoration: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.cdc-button-primary {
+    background: #0073aa;
+    color: #fff;
+    border-color: #0073aa;
+}
+
+.cdc-button-primary:hover {
+    background: #005a87;
+    border-color: #005a87;
+}
+
+/* ==========================================================================
+   Utilities
+   ========================================================================== */
+
+.cdc-text-center {
+    text-align: center;
+}
+
+.cdc-text-muted {
+    color: #646970;
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media (max-width: 768px) {
+    .cdc-sidebar {
+        width: 60px;
+    }
+
+    .cdc-sidebar-text,
+    .cdc-sidebar-header p {
+        display: none;
+    }
+
+    .cdc-sidebar-header h2 {
+        font-size: 14px;
+    }
+
+    .cdc-main {
+        margin-left: 60px;
+    }
+
+    .cdc-content {
+        padding: 20px;
+    }
+
+    .cdc-quick-actions {
+        grid-template-columns: 1fr;
+    }
+}
