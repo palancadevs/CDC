@@ -16,6 +16,8 @@ define('CDC_THEME_URL', get_template_directory_uri());
 
 // Require includes
 require_once CDC_THEME_DIR . '/includes/enqueue.php';
+require_once CDC_THEME_DIR . '/includes/auth.php';
+require_once CDC_THEME_DIR . '/includes/session-guard.php';
 
 /**
  * Theme setup
@@ -40,22 +42,6 @@ function cdc_sistema_setup() {
 add_action('after_setup_theme', 'cdc_sistema_setup');
 
 /**
- * Get current user name (dummy for Phase 1)
- * In future phases this will return actual logged-in user
- */
-function cdc_get_current_user_name() {
-    return 'Usuario Sistema';
-}
-
-/**
- * Get user role display name (dummy for Phase 1)
- * In future phases this will return actual user role
- */
-function cdc_get_user_role_display() {
-    return 'Admin';
-}
-
-/**
  * Create required pages on theme activation
  */
 function cdc_create_required_pages() {
@@ -65,6 +51,14 @@ function cdc_create_required_pages() {
     }
 
     $pages = array(
+        array(
+            'post_title'   => 'Login',
+            'post_name'    => 'login',
+            'post_content' => '',
+            'post_status'  => 'publish',
+            'post_type'    => 'page',
+            'page_template' => 'page-login.php'
+        ),
         array(
             'post_title'   => 'Personas',
             'post_name'    => 'personas',

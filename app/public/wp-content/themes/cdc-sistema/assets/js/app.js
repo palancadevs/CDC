@@ -208,45 +208,43 @@
         },
 
         /**
-         * Show Notification
+         * Show Notification (Toast)
          * @param {string} message - Notification message
          * @param {string} type - Notification type (success, error, warning, info)
          */
         showNotification: function(message, type) {
             type = type || 'info';
 
-            // For now, use alert (will be replaced with better notification system)
-            alert(message);
-
-            /* FUTURE IMPLEMENTATION: Toast notifications
-            const $notification = $(`
-                <div class="cdc-notification cdc-notification-${type}">
+            const $toast = $(`
+                <div class="cdc-toast cdc-toast-${type}">
                     <span class="dashicons dashicons-${this.getNotificationIcon(type)}"></span>
-                    <span class="cdc-notification-message">${message}</span>
-                    <button class="cdc-notification-close">&times;</button>
+                    <span class="cdc-toast-message">${message}</span>
+                    <button class="cdc-toast-close">&times;</button>
                 </div>
             `);
 
-            $('body').append($notification);
+            $('body').append($toast);
 
+            // Show toast
             setTimeout(function() {
-                $notification.addClass('cdc-notification-show');
+                $toast.addClass('show');
             }, 100);
 
+            // Auto-hide after 3 seconds
             setTimeout(function() {
-                $notification.removeClass('cdc-notification-show');
+                $toast.removeClass('show');
                 setTimeout(function() {
-                    $notification.remove();
+                    $toast.remove();
                 }, 300);
-            }, 3000);
+            }, 3500);
 
-            $notification.find('.cdc-notification-close').on('click', function() {
-                $notification.removeClass('cdc-notification-show');
+            // Close button
+            $toast.find('.cdc-toast-close').on('click', function() {
+                $toast.removeClass('show');
                 setTimeout(function() {
-                    $notification.remove();
+                    $toast.remove();
                 }, 300);
             });
-            */
         },
 
         /**
@@ -262,6 +260,19 @@
                 info: 'info'
             };
             return icons[type] || 'info';
+        },
+
+        /**
+         * Show loading state
+         * @param {string} selector - jQuery selector for element to show loading in
+         */
+        showLoading: function(selector) {
+            $(selector).html(`
+                <div class="cdc-loading">
+                    <div class="spinner"></div>
+                    <p>Cargando...</p>
+                </div>
+            `);
         },
 
         /**
