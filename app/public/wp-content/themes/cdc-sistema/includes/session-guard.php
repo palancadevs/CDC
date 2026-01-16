@@ -28,8 +28,19 @@ function cdc_check_authentication() {
         return;
     }
 
-    // Check if we're on the login page
-    if (is_page('login')) {
+    // Get current URL path
+    $current_path = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
+    $home_path = trim(parse_url(home_url(), PHP_URL_PATH), '/');
+
+    // Remove home path from current path
+    if ($home_path && strpos($current_path, $home_path) === 0) {
+        $current_path = trim(substr($current_path, strlen($home_path)), '/');
+    }
+
+    // Check if we're on the login page (by URL or by is_page check)
+    $is_login_page = (is_page('login') || $current_path === 'login');
+
+    if ($is_login_page) {
         // If already logged in, redirect to dashboard
         if (is_user_logged_in()) {
             wp_redirect(home_url('/'));
@@ -41,6 +52,10 @@ function cdc_check_authentication() {
 
     // All other pages require authentication
     if (!is_user_logged_in()) {
+        // Prevent redirect loop
+        if ($current_path === 'login') {
+            return;
+        }
         wp_redirect(home_url('/login'));
         exit;
     }
