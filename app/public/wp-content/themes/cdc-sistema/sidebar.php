@@ -19,10 +19,10 @@ $menu_items = array();
 
 // Siempre mostrar inicio
 $menu_items[] = array(
-    'slug' => 'dashboard',
+    'slug' => 'home',
     'title' => 'Inicio',
     'icon' => 'dashicons-dashboard',
-    'url' => home_url('/dashboard'),
+    'url' => home_url('/'),
 );
 
 // Personas

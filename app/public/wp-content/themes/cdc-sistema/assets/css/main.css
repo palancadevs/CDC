@@ -354,6 +354,284 @@ body {
 }
 
 /* ==========================================================================
+   Page Header
+   ========================================================================== */
+
+.cdc-page-header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}
+
+.cdc-page-header-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* ==========================================================================
+   Tables
+   ========================================================================== */
+
+.cdc-table-wrapper {
+    overflow-x: auto;
+}
+
+.cdc-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.cdc-table thead {
+    background: #f0f0f1;
+}
+
+.cdc-table th {
+    text-align: left;
+    padding: 12px;
+    font-weight: 600;
+    border-bottom: 2px solid #dcdcde;
+}
+
+.cdc-table td {
+    padding: 12px;
+    border-bottom: 1px solid #f0f0f1;
+}
+
+.cdc-table tbody tr:hover {
+    background: #f6f7f7;
+}
+
+/* ==========================================================================
+   Filters Bar
+   ========================================================================== */
+
+.cdc-filters-bar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* ==========================================================================
+   Tabs
+   ========================================================================== */
+
+.cdc-tabs {
+    display: flex;
+    gap: 5px;
+    border-bottom: 2px solid #dcdcde;
+    margin-bottom: 15px;
+}
+
+.cdc-tab {
+    padding: 10px 20px;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: #646970;
+    transition: all 0.2s;
+}
+
+.cdc-tab:hover {
+    color: #0073aa;
+}
+
+.cdc-tab-active {
+    color: #0073aa;
+    border-bottom-color: #0073aa;
+}
+
+/* ==========================================================================
+   Payment Type Cards (Cobrar)
+   ========================================================================== */
+
+.cdc-payment-types {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.cdc-payment-type-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 20px;
+    background: #f0f0f1;
+    border: 2px solid #dcdcde;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+}
+
+.cdc-payment-type-card:hover {
+    background: #e5f5fa;
+    border-color: #0073aa;
+    transform: translateY(-2px);
+}
+
+.cdc-payment-type-card.active {
+    background: #0073aa;
+    border-color: #0073aa;
+    color: #fff;
+}
+
+.cdc-payment-type-card .dashicons {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 10px;
+}
+
+.cdc-payment-type-card strong {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.cdc-payment-type-card small {
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+/* ==========================================================================
+   Form Enhancements
+   ========================================================================== */
+
+.cdc-form-group {
+    margin-bottom: 20px;
+}
+
+.cdc-form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #2c3338;
+}
+
+.cdc-form-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.cdc-form-col-6 {
+    flex: 1;
+}
+
+.cdc-form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #dcdcde;
+}
+
+.cdc-button-secondary {
+    background: #f0f0f1;
+    color: #2c3338;
+    border-color: #dcdcde;
+}
+
+.cdc-button-secondary:hover {
+    background: #dcdcde;
+    border-color: #8c8f94;
+}
+
+.cdc-radio-group {
+    display: flex;
+    gap: 20px;
+}
+
+.cdc-radio {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.cdc-radio input[type="radio"] {
+    margin-right: 8px;
+}
+
+/* ==========================================================================
+   Caja Summary
+   ========================================================================== */
+
+.cdc-caja-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.cdc-summary-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background: #f0f0f1;
+    border-radius: 4px;
+}
+
+.cdc-summary-label {
+    font-size: 14px;
+    color: #646970;
+    margin-bottom: 10px;
+}
+
+.cdc-summary-value {
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.cdc-ingreso {
+    color: #28a745;
+}
+
+.cdc-egreso {
+    color: #d63638;
+}
+
+.cdc-saldo {
+    color: #0073aa;
+}
+
+/* ==========================================================================
+   Badges
+   ========================================================================== */
+
+.cdc-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.cdc-badge-success {
+    background: #d4edda;
+    color: #155724;
+}
+
+.cdc-badge-warning {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.cdc-badge-danger {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.cdc-badge-info {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+/* ==========================================================================
    Responsive
    ========================================================================== */
 
