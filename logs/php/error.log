@@ -145,3 +145,18 @@ Stack trace:
 #2 /Users/joanromero/Local Sites/cdc-gestion/app/public/index.php(17): require('/Users/joanrome...')
 #3 {main}
   thrown in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/index.php on line 16
+[16-Jan-2026 20:02:05 UTC] PHP Warning:  require_once(../../../../../wp-load.php): Failed to open stream: No such file or directory in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/create-pages.php on line 9
+[16-Jan-2026 20:02:05 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '../../../../../wp-load.php' (include_path='.:/usr/share/php:/www/wp-content/pear') in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/create-pages.php:9
+Stack trace:
+#0 {main}
+  thrown in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/create-pages.php on line 9
+[16-Jan-2026 20:03:28 UTC] PHP Warning:  require_once(../../../../../wp-load.php): Failed to open stream: No such file or directory in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/create-pages.php on line 9
+[16-Jan-2026 20:03:28 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '../../../../../wp-load.php' (include_path='.:/usr/share/php:/www/wp-content/pear') in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/create-pages.php:9
+Stack trace:
+#0 {main}
+  thrown in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/create-pages.php on line 9
+[16-Jan-2026 20:07:27 UTC] PHP Warning:  require_once(../../../../../wp-load.php): Failed to open stream: No such file or directory in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/diagnostico.php on line 8
+[16-Jan-2026 20:07:27 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '../../../../../wp-load.php' (include_path='.:/usr/share/php:/www/wp-content/pear') in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/diagnostico.php:8
+Stack trace:
+#0 {main}
+  thrown in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/diagnostico.php on line 8
