@@ -1,6 +1,6 @@
 <?php
 /**
- * Template Name: Dashboard CDC
+ * Front Page - Dashboard CDC
  *
  * @package CDC_Sistema
  */
@@ -8,9 +8,6 @@
 if (!defined('ABSPATH')) {
     exit;
 }
-
-// Require authentication
-cdc_require_auth();
 
 get_header();
 ?>

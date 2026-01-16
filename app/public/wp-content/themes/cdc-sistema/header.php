@@ -9,8 +9,9 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-$current_user = cdc_get_current_user();
-$user_role = cdc_get_user_role_display($current_user);
+// Phase 1: No login/auth - using dummy data
+$user_name = cdc_get_current_user_name();
+$user_role = cdc_get_user_role_display();
 ?>
 <!DOCTYPE html>
 <html <?php language_attributes(); ?>>
@@ -31,10 +32,7 @@ $user_role = cdc_get_user_role_display($current_user);
             </div>
             <div class="cdc-header-right">
                 <span class="cdc-user-role"><?php echo esc_html($user_role); ?></span>
-                <span class="cdc-user-name"><?php echo esc_html($current_user->display_name); ?></span>
-                <a href="<?php echo esc_url(home_url('/?action=logout')); ?>" class="cdc-logout">
-                    Salir
-                </a>
+                <span class="cdc-user-name"><?php echo esc_html($user_name); ?></span>
             </div>
         </header>
 

@@ -63,9 +63,10 @@
 **IMPORTANTE:** Este es un sistema **frontend completo**, NO un plugin de wp-admin.
 
 - **Frontend:** Aplicación web completa en el sitio raíz (`http://localhost:10013/`)
-- **Backend:** WordPress + WooCommerce como REST API
-- **Autenticación:** Login custom (DNI como usuario)
-- **Acceso:** Sistema privado para uso interno exclusivamente
+- **Backend:** WordPress + WooCommerce como REST API (plugin `cdc-api`)
+- **Autenticación:** SIN login en Fase 1 - acceso libre para desarrollo y testing
+  - Los roles y permisos se implementarán en una fase futura
+- **Acceso:** Sistema abierto durante desarrollo, será privado en producción
 
 ### Estructura Técnica
 ```
@@ -83,12 +84,13 @@
 
 ## Flujo de Desarrollo Recomendado
 
-### Fase 1: Setup Base Frontend (Épica E0)
-1. Crear tema custom `cdc-sistema`
-2. Implementar login custom (DNI + contraseña)
-3. Crear layout base con sidebar de navegación
-4. Implementar sistema de roles y permisos
-5. Dashboard/Inicio con acciones rápidas
+### Fase 1: Setup Base Frontend (Épica E0) ✅ COMPLETADO
+1. ✅ Crear tema custom `cdc-sistema`
+2. ✅ Crear layout base con sidebar de navegación
+3. ✅ Dashboard/Inicio con acciones rápidas
+4. ✅ Plugin `cdc-api` con base de datos (13 tablas)
+5. ✅ Modelos, servicios y REST API
+6. ⏸️ Login y roles (POSPUESTO para fase futura)
 
 ### Fase 2: Módulo Personas (Épica E2)
 1. Crear tabla `cdc_persona`
