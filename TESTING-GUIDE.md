@@ -1,340 +1,632 @@
-# Guía de Pruebas - CDC Sistema
+# Guía de Testing - CDC Sistema
 
-## Prerequisitos
+Esta guía documenta todas las herramientas de testing y diagnóstico disponibles en el sistema CDC.
 
-### 1. Activar plugin cdc-api
-1. Ve a: http://localhost:10013/wp-admin/
-2. Login con tus credenciales de WordPress admin
-3. Ve a Plugins → Plugins instalados
-4. Busca "CDC API" y haz click en "Activar"
-5. Verifica que se hayan creado las tablas en la base de datos
+---
 
-### 2. Insertar datos de prueba
-Ejecuta el archivo `test-data.sql` en tu base de datos:
+## 📋 Tabla de Contenidos
 
-**Opción A: Usando phpMyAdmin**
-1. Ve a http://localhost:10013/phpmyadmin (o tu gestor de BD)
-2. Selecciona la base de datos de WordPress
-3. Ve a la pestaña "SQL"
-4. Copia el contenido de `test-data.sql`
-5. Haz click en "Continuar"
+1. [Tests Automatizados](#tests-automatizados)
+2. [Tests Manuales desde Navegador](#tests-manuales-desde-navegador)
+3. [Tests desde Terminal](#tests-desde-terminal)
+4. [Herramientas de Diagnóstico](#herramientas-de-diagnóstico)
+5. [Verificación de Sistema](#verificación-de-sistema)
+6. [Resultados Esperados](#resultados-esperados)
+7. [Troubleshooting](#troubleshooting)
 
-**Opción B: Usando Local by Flywheel**
-1. Click derecho en tu sitio → "Open site shell"
-2. Ejecuta: `wp db query < test-data.sql`
+---
 
-**Opción C: Usando línea de comandos**
-```bash
-cd "/Users/joanromero/Local Sites/cdc-gestion"
-# Reemplaza USER y PASSWORD con tus credenciales de MySQL
-mysql -u root -p local < test-data.sql
+## 🧪 Tests Automatizados
+
+### Suite Completa de Tests Interactivos
+
+**URL de acceso**: http://localhost:10013/tests-v2/
+
+Esta página ejecuta 13 tests automatizados que verifican todas las funcionalidades principales del sistema.
+
+### Cómo Ejecutar
+
+1. Abrir navegador en: http://localhost:10013/tests-v2/
+2. Verificar que aparezca: "✅ Todos los scripts cargados correctamente"
+3. Click en botón **"▶️ Ejecutar Todos los Tests"**
+4. Observar la barra de progreso y resultados en tiempo real
+5. Verificar resumen final
+
+### Tests Incluidos
+
+#### **Sección 1: API REST (4 tests)**
+- Test 1.1: API REST disponible
+- Test 1.2: Endpoint GET /personas responde
+- Test 1.3: Endpoint GET /caja/movimientos/today responde
+- Test 1.4: Endpoint GET /talleres responde
+
+#### **Sección 2: Creación de Personas (3 tests)**
+- Test 2.1: Crear nuevo socio via API
+- Test 2.2: Crear nuevo cliente via API
+- Test 2.3: Buscar persona creada
+
+#### **Sección 3: Recibos/Cobros (2 tests)**
+- Test 3.1: Crear recibo de cobro
+- Test 3.2: Listar recibos
+
+#### **Sección 4: Caja/Gastos (2 tests)**
+- Test 4.1: Registrar gasto via API
+- Test 4.2: Listar movimientos de caja
+
+#### **Sección 5: Talleres (2 tests)**
+- Test 5.1: Crear taller via API
+- Test 5.2: Listar talleres
+
+### Interpretación de Resultados
+
+**Estados de los tests**:
+- 🟡 **Ejecutando...**: Test en progreso
+- ✅ **PASS**: Test exitoso
+- ❌ **FAIL**: Test falló
+
+**Resumen final**:
+```
+Total tests: 13
+✅ Pasados: 13
+❌ Fallados: 0
+
+🎉 ¡Todos los tests pasaron!
 ```
 
-### 3. Activar el tema cdc-sistema (si no está activado)
-1. Ve a: http://localhost:10013/wp-admin/themes.php
-2. Activa "CDC Sistema"
-3. Las páginas (Login, Personas, Cobrar, etc.) se crearán automáticamente
+---
+
+## 🖱️ Tests Manuales desde Navegador
+
+### Test Manual 1: Dashboard y Navegación
+
+**Objetivo**: Verificar que el sistema carga y la navegación funciona
+
+1. Ir a: http://localhost:10013/
+2. **Verificar**:
+   - ✅ Dashboard carga correctamente
+   - ✅ Sidebar muestra menú de navegación
+   - ✅ Header muestra información del sistema
+   - ✅ No hay errores en consola del navegador (F12)
+
+3. **Navegar por el menú**:
+   - Click en "Personas" → debe cargar lista de personas
+   - Click en "Cobrar" → debe mostrar selector de tipo de cobro
+   - Click en "Caja" → debe mostrar movimientos
+   - Click en "Talleres" → debe listar talleres
+
+**✅ PASS**: Navegación fluida sin errores
+**❌ FAIL**: Errores 404, páginas en blanco, o errores en consola
 
 ---
 
-## Pruebas del Sistema de Autenticación
+### Test Manual 2: Crear Socio/Cliente
 
-### Test 1: Acceso sin login (Protección de páginas)
-**Objetivo:** Verificar que todas las páginas redirigen a login
+**Objetivo**: Verificar formularios de creación
 
-1. **Abre navegador en modo incógnito**
-2. Ve a: http://localhost:10013/
-3. **Resultado esperado:** Debes ser redirigido a http://localhost:10013/login
-4. Prueba otras URLs:
-   - http://localhost:10013/personas → Debe redirigir a /login
-   - http://localhost:10013/cobrar → Debe redirigir a /login
-   - http://localhost:10013/caja → Debe redirigir a /login
+1. Ir a: http://localhost:10013/nuevo-socio/
+2. **Completar formulario**:
+   - Nombre: Test Manual
+   - Apellido: Sistema
+   - DNI: 11111111
+   - Email: test@manual.com
+   - Teléfono: 3815000000
+   - Categoría: General
 
-**✅ PASS:** Todas las páginas redirigen a login
-**❌ FAIL:** Puedes ver contenido sin estar logueado
+3. Click "Guardar Socio"
+4. **Verificar**:
+   - ✅ Aparece notificación de éxito
+   - ✅ Redirige a lista de personas o ficha
+   - ✅ Nuevo socio aparece en lista
 
----
-
-### Test 2: Login con DNI válido
-**Objetivo:** Autenticación exitosa crea usuario WordPress y da acceso
-
-1. **En la página de login** (http://localhost:10013/login)
-2. **Ingresa DNI:** `12345678`
-3. **Haz click en "Ingresar"**
-4. **Resultados esperados:**
-   - Aparece mensaje "Verificando credenciales..."
-   - Eres redirigido a la página de inicio (dashboard)
-   - En el header ves: "Socio" y "Juan Pérez"
-   - Hay un botón "Cerrar sesión"
-
-**✅ PASS:** Login exitoso, ves el dashboard
-**❌ FAIL:** Error o no redirige
-
-**Si falla:**
-- Abre la consola del navegador (F12)
-- Ve a la pestaña "Network" y busca errores
-- Verifica que el plugin cdc-api esté activado
-- Verifica que la tabla wp_cdc_personas tenga el DNI 12345678
+**✅ PASS**: Socio creado correctamente
+**❌ FAIL**: Error al guardar o no aparece en lista
 
 ---
 
-### Test 3: Login con DNI inválido
-**Objetivo:** Validación de DNI y manejo de errores
+### Test Manual 3: Apertura de Caja
 
-**Pruebas:**
+**Objetivo**: Verificar sistema de caja
 
-1. **DNI no numérico:**
-   - Ingresa: `abcd1234`
-   - **Esperado:** No permite ingresar letras (campo solo acepta números)
+1. Abrir consola del navegador (F12)
+2. **Ejecutar**:
+```javascript
+CDCAPI.caja.abrirCaja({
+  monto_inicial: 10000,
+  responsable: "Test Manual"
+})
+.then(response => console.log('Resultado:', response))
+.catch(error => console.error('Error:', error));
+```
 
-2. **DNI muy corto:**
-   - Ingresa: `123`
-   - Click "Ingresar"
-   - **Esperado:** Error "El DNI debe tener 7 u 8 dígitos"
+3. **Verificar**:
+   - ✅ Respuesta: `{success: true, message: "Caja abierta correctamente"}`
+   - ✅ Balance actualizado a $10,000
 
-3. **DNI que no existe:**
-   - Ingresa: `99999999`
-   - Click "Ingresar"
-   - **Esperado:** Error "DNI no encontrado en el sistema"
+4. **Verificar balance**:
+```javascript
+CDCAPI.caja.balance()
+.then(response => console.log('Balance:', response));
+```
 
-**✅ PASS:** Todos los errores se muestran correctamente
-**❌ FAIL:** Permite DNI inválidos o no muestra errores
+**Resultado esperado**:
+```json
+{
+  "success": true,
+  "data": {
+    "balance": 10000
+  }
+}
+```
 
----
-
-### Test 4: Header con datos reales
-**Objetivo:** Verificar que el header muestre información de la persona logueada
-
-1. **Estando logueado** con DNI 12345678
-2. **Mira el header** (esquina superior derecha)
-3. **Debes ver:**
-   - Badge azul con texto "Socio"
-   - Nombre "Juan Pérez"
-   - Link "Cerrar sesión" con icono
-
-**✅ PASS:** Header muestra datos correctos
-**❌ FAIL:** Muestra "Usuario Sistema" o datos dummy
-
----
-
-### Test 5: Navegación entre páginas
-**Objetivo:** Verificar que la sesión persiste
-
-1. **Estando logueado**, navega por el menú lateral:
-   - Personas
-   - Cobrar
-   - Caja
-   - Talleres
-   - Eventos
-   - Salas
-
-2. **Resultado esperado:**
-   - Puedes acceder a todas las páginas
-   - El header siempre muestra tus datos
-   - No te pide login nuevamente
-
-**✅ PASS:** Navegación fluida, sesión persistente
-**❌ FAIL:** Te pide login al cambiar de página
+**✅ PASS**: Caja abierta y balance correcto
+**❌ FAIL**: Error o balance incorrecto
 
 ---
 
-### Test 6: Logout
-**Objetivo:** Cerrar sesión correctamente
+### Test Manual 4: Crear Recibo de Cobro
 
-1. **Estando logueado**, haz click en "Cerrar sesión"
-2. **Resultado esperado:**
-   - Eres redirigido a /login
-   - Si intentas ir a / te redirige a /login
-   - No puedes acceder a ninguna página sin login
+**Objetivo**: Verificar flujo completo de cobro
 
-**✅ PASS:** Logout funciona, no puedes acceder sin login
-**❌ FAIL:** Puedes acceder después de hacer logout
+**Pre-requisito**: Tener caja abierta (Test Manual 3)
 
----
-
-### Test 7: Sesión en múltiples tabs
-**Objetivo:** Verificar comportamiento de sesión
-
-1. **Estando logueado**, abre una nueva pestaña
-2. Ve a: http://localhost:10013/personas
-3. **Resultado esperado:**
-   - Puedes ver la página (sesión compartida)
-   - El header muestra tus datos
-
-4. **En la primera tab**, haz logout
-5. **En la segunda tab**, intenta navegar o refrescar
-6. **Resultado esperado:**
-   - Te redirige a /login (sesión cerrada en todas las tabs)
-
-**✅ PASS:** Sesión consistente en todas las tabs
-**❌ FAIL:** Comportamiento inconsistente
-
----
-
-### Test 8: Login con diferentes tipos de persona
-**Objetivo:** Verificar que el rol se muestra correctamente
-
-**Logout primero, luego prueba con estos DNI:**
-
-1. **DNI: 87654321** (María González - Cliente)
-   - **Esperado:** Badge muestra "Cliente"
-
-2. **DNI: 11223344** (Carlos Rodríguez - Ambos)
-   - **Esperado:** Badge muestra "Socio/Cliente"
-
-3. **DNI: 44332211** (Ana Martínez - Socio)
-   - **Esperado:** Badge muestra "Socio"
-
-**✅ PASS:** Cada tipo muestra el badge correcto
-**❌ FAIL:** Todos muestran el mismo rol
-
----
-
-### Test 9: Persistencia de sesión tras refresh
-**Objetivo:** Sesión sobrevive a recargas de página
-
-1. **Estando logueado**
-2. Presiona F5 o Cmd+R (refresh)
-3. **Resultado esperado:**
-   - Sigues logueado
-   - No te pide login nuevamente
-
-**✅ PASS:** Sesión persiste tras refresh
-**❌ FAIL:** Te pide login de nuevo
-
----
-
-### Test 10: Creación automática de usuario WordPress
-**Objetivo:** Verificar que se crea usuario en WordPress
-
-1. **Login con DNI nuevo** (por ejemplo, uno de los otros DNI de prueba)
-2. **Ve a WordPress admin:** http://localhost:10013/wp-admin/users.php
-3. **Busca el usuario** con username = DNI (ej: 87654321)
-4. **Verifica:**
-   - Usuario existe
-   - Email coincide con cdc_personas
-   - Rol es "CDC User"
-
-**✅ PASS:** Usuario WordPress creado correctamente
-**❌ FAIL:** No se crea usuario
-
----
-
-## Pruebas de Integración API (Preparación)
-
-### Test 11: API disponible
-**Objetivo:** Verificar que el REST API funciona
-
-1. **Estando logueado**
-2. **Abre consola del navegador** (F12)
-3. **Ejecuta este código:**
+1. **Obtener ID de un socio**:
 ```javascript
 CDCAPI.personas.list()
-  .then(response => console.log('API Response:', response))
-  .catch(error => console.error('API Error:', error));
+.then(response => console.log('Personas:', response.data));
 ```
 
-4. **Resultado esperado:**
-   - Si hay personas: `{success: true, data: [...]}`
-   - Si no hay personas: `{success: true, data: []}`
-
-**✅ PASS:** API responde correctamente
-**❌ FAIL:** Error 401, 404, o sin respuesta
-
----
-
-### Test 12: Notificaciones Toast
-**Objetivo:** Verificar sistema de notificaciones
-
-1. **Estando logueado**
-2. **Abre consola del navegador** (F12)
-3. **Ejecuta estos comandos:**
+2. **Crear recibo** (reemplazar `SOCIO_ID` con un ID real):
 ```javascript
-// Prueba notificación de éxito
-CDC.showNotification('Prueba exitosa', 'success');
-
-// Espera 4 segundos, luego prueba error
-setTimeout(() => CDC.showNotification('Prueba de error', 'error'), 4000);
-
-// Espera más, prueba warning
-setTimeout(() => CDC.showNotification('Prueba de advertencia', 'warning'), 8000);
-
-// Prueba info
-setTimeout(() => CDC.showNotification('Prueba informativa', 'info'), 12000);
+CDCAPI.recibos.create({
+  persona_id: SOCIO_ID,
+  tipo: 'cuota-socio',
+  items: [{
+    descripcion: 'Cuota Test',
+    cantidad: 1,
+    precio_unitario: 2000,
+    subtotal: 2000
+  }],
+  total: 2000,
+  metodo_pago: 'efectivo',
+  concepto: 'Cuota mensual'
+})
+.then(response => console.log('Recibo:', response))
+.catch(error => console.error('Error:', error));
 ```
 
-4. **Resultado esperado:**
-   - Aparecen toast notifications en la esquina superior derecha
-   - Cada una con color e icono diferente
-   - Se auto-cierran después de 3.5 segundos
-   - Puedes cerrarlas manualmente con la X
+3. **Verificar respuesta**:
+```json
+{
+  "success": true,
+  "message": "Recibo creado correctamente",
+  "data": {
+    "recibo_id": 1,
+    "numero_recibo": "C20260119-001"
+  }
+}
+```
 
-**✅ PASS:** Notificaciones funcionan correctamente
-**❌ FAIL:** No aparecen o no se ven bien
+4. **Verificar balance actualizado**:
+```javascript
+CDCAPI.caja.balance()
+.then(response => console.log('Nuevo balance:', response));
+```
 
----
+**Resultado esperado**: Balance = $10,000 + $2,000 = $12,000
 
-## Problemas Comunes y Soluciones
-
-### Problema: "Error de conexión" al hacer login
-**Causa:** Plugin cdc-api no está activado o tablas no existen
-**Solución:**
-1. Verifica activación del plugin
-2. Desactiva y reactiva el plugin para crear tablas
-3. Verifica que existan las tablas en la base de datos
-
-### Problema: "DNI no encontrado" con DNI correcto
-**Causa:** Datos de prueba no insertados
-**Solución:**
-1. Ejecuta test-data.sql nuevamente
-2. Verifica manualmente en phpMyAdmin que existe el registro
-
-### Problema: Redirige a /login infinitamente
-**Causa:** Error en session-guard.php o persona_id no vinculado
-**Solución:**
-1. Revisa errores PHP en logs/php/error.log
-2. Verifica que wp_usermeta tenga cdc_persona_id
-
-### Problema: Header muestra "Usuario Sistema"
-**Causa:** Funciones dummy no fueron eliminadas correctamente
-**Solución:** Ya fueron eliminadas en el commit, verifica que tengas la última versión
-
-### Problema: API devuelve 401
-**Causa:** Sesión no está establecida correctamente
-**Solución:**
-1. Verifica que wp_set_auth_cookie() se ejecutó
-2. Prueba logout y login nuevamente
-3. Limpia cookies del navegador
+**✅ PASS**: Recibo creado y balance actualizado
+**❌ FAIL**: Error o balance incorrecto
 
 ---
 
-## Checklist Final
+## 💻 Tests desde Terminal
 
-Antes de continuar con las pantallas, verifica:
+### Test 1: Verificar API REST Disponible
 
-- [ ] Plugin cdc-api activado
-- [ ] Tema cdc-sistema activado
-- [ ] Datos de prueba insertados
-- [ ] Puedes hacer login con DNI 12345678
-- [ ] Header muestra "Juan Pérez" y "Socio"
-- [ ] Logout funciona
-- [ ] API responde (Test 11)
-- [ ] Notificaciones funcionan (Test 12)
+```bash
+curl -s "http://localhost:10013/wp-json/cdc/v1/" | python3 -m json.tool
+```
+
+**Resultado esperado**: Lista de endpoints disponibles
+
+---
+
+### Test 2: Listar Personas
+
+```bash
+curl -s "http://localhost:10013/wp-json/cdc/v1/personas" | python3 -m json.tool
+```
+
+**Resultado esperado**:
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "1",
+      "nombre": "Juan",
+      "apellido": "Pérez",
+      "dni": "12345678",
+      "tipo": "socio",
+      ...
+    }
+  ]
+}
+```
+
+---
+
+### Test 3: Buscar Persona por Query
+
+```bash
+curl -s "http://localhost:10013/wp-json/cdc/v1/personas/search?query=Juan" | python3 -m json.tool
+```
+
+---
+
+### Test 4: Balance de Caja
+
+```bash
+curl -s "http://localhost:10013/wp-json/cdc/v1/caja/balance" | python3 -m json.tool
+```
+
+**Resultado esperado**:
+```json
+{
+  "success": true,
+  "data": {
+    "balance": 10000
+  }
+}
+```
+
+---
+
+### Test 5: Movimientos de Hoy
+
+```bash
+curl -s "http://localhost:10013/wp-json/cdc/v1/caja/movimientos/today" | python3 -m json.tool
+```
+
+---
+
+### Test 6: Crear Socio (POST)
+
+```bash
+curl -X POST "http://localhost:10013/wp-json/cdc/v1/personas" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tipo": "socio",
+    "nombre": "Terminal",
+    "apellido": "Test",
+    "dni": "22222222",
+    "email": "terminal@test.com"
+  }' | python3 -m json.tool
+```
+
+**Resultado esperado**:
+```json
+{
+  "success": true,
+  "message": "Persona creada exitosamente",
+  "data": {
+    "id": 5
+  }
+}
+```
+
+---
+
+### Test 7: Abrir Caja (POST)
+
+```bash
+curl -X POST "http://localhost:10013/wp-json/cdc/v1/caja/apertura" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "monto_inicial": 5000,
+    "responsable": "Terminal Test"
+  }' | python3 -m json.tool
+```
+
+---
+
+### Script de Tests Completo
+
+Guardar como `run-tests.sh`:
+
+```bash
+#!/bin/bash
+
+API_URL="http://localhost:10013/wp-json/cdc/v1"
+PASSED=0
+FAILED=0
+
+echo "🧪 Ejecutando tests de CDC API..."
+
+# Test API disponible
+if curl -s "$API_URL/" | grep -q "namespace"; then
+  echo "✅ Test 1: API disponible"
+  ((PASSED++))
+else
+  echo "❌ Test 1: API no disponible"
+  ((FAILED++))
+fi
+
+# Test listar personas
+if curl -s "$API_URL/personas" | grep -q "success"; then
+  echo "✅ Test 2: GET /personas"
+  ((PASSED++))
+else
+  echo "❌ Test 2: GET /personas falló"
+  ((FAILED++))
+fi
+
+# Test balance
+if curl -s "$API_URL/caja/balance" | grep -q "balance"; then
+  echo "✅ Test 3: GET /caja/balance"
+  ((PASSED++))
+else
+  echo "❌ Test 3: GET /caja/balance falló"
+  ((FAILED++))
+fi
+
+echo ""
+echo "Resultado: $PASSED pasados, $FAILED fallados"
+```
+
+**Ejecutar**:
+```bash
+chmod +x run-tests.sh
+./run-tests.sh
+```
+
+---
+
+## 🔍 Herramientas de Diagnóstico
+
+### Panel de Diagnóstico del Sistema
+
+**URL**: http://localhost:10013/diagnostico/
+
+**Información mostrada**:
+- ✅ Estado del plugin CDC API (activado/desactivado)
+- ✅ Estado del tema CDC Sistema (activado/desactivado)
+- ✅ Tablas de base de datos (13 tablas custom)
+- ✅ Endpoints REST API disponibles
+- ✅ Páginas del sistema creadas
+- ✅ Configuración de WordPress
+
+**Usar cuando**:
+- Problemas con API (404, errores)
+- Verificar instalación inicial
+- Debugging general del sistema
+
+---
+
+### Verificador de Páginas
+
+**URL**: http://localhost:10013/verificar-paginas.php
+
+**Verifica**:
+- ✅ Página "Personas" existe
+- ✅ Página "Cobrar" existe
+- ✅ Página "Registrar Gasto" existe
+- ✅ Página "Talleres" existe
+- ✅ Página "Eventos" existe
+- ✅ Página "Salas" existe
+- ✅ Página "Diagnóstico" existe
+- ✅ Página "Tests" existe
+
+**Acción**: Si faltan páginas, muestra instrucciones para crearlas
+
+---
+
+### Verificador de Templates
+
+**URL**: http://localhost:10013/verificar-templates.php
+
+**Verifica**:
+- ✅ Templates del tema existen en disco
+- ✅ Templates asignados a páginas
+- ✅ Permisos de archivos correctos
+
+---
+
+### Instalador de Tablas
+
+**URL**: http://localhost:10013/instalar-tablas/
+
+**Función**: Crear/reinstalar tablas de base de datos
+
+**Usar cuando**:
+- Primera instalación
+- Tablas corruptas
+- Reset de base de datos
+
+**⚠️ ADVERTENCIA**: Esto puede borrar datos. Usar solo en desarrollo.
+
+---
+
+## ✅ Resultados Esperados
+
+### Estado Óptimo del Sistema
+
+Cuando todo funciona correctamente:
+
+**Tests Automatizados**:
+```
+Total tests: 13
+✅ Pasados: 13
+❌ Fallados: 0
+```
+
+**Panel de Diagnóstico**:
+- Plugin CDC API: ✅ Activado
+- Tema CDC Sistema: ✅ Activado
+- Tablas creadas: ✅ 13/13
+- Páginas creadas: ✅ 8/8
+- API REST: ✅ Disponible
+
+**API REST**:
+- Todos los endpoints responden con HTTP 200
+- Formato de respuesta: `{"success": true, "data": ...}`
+- Sin errores en logs
+
+**Base de Datos**:
+```sql
+-- Tablas que deben existir:
+wp_cdc_personas
+wp_cdc_recibos
+wp_cdc_movimientos_caja
+wp_cdc_gastos
+wp_cdc_talleres
+wp_cdc_eventos
+wp_cdc_salas
+wp_cdc_reservas_salas
+wp_cdc_cuotas_talleres
+wp_cdc_inscripciones_talleres
+wp_cdc_entradas_eventos
+wp_cdc_talleristas
+wp_cdc_categorias_gastos
+```
+
+---
+
+## 🐛 Troubleshooting
+
+### Problema: Tests Fallan (0/13 pasados)
+
+**Causa probable**: Scripts no cargados o plugin inactivo
+
+**Solución**:
+1. Abrir consola del navegador (F12)
+2. Buscar errores JavaScript
+3. Verificar que plugin CDC API esté activado
+4. Ir a http://localhost:10013/diagnostico/ y verificar estado
+
+---
+
+### Problema: API devuelve 404
+
+**Causa probable**: Permalinks no actualizados o plugin inactivo
+
+**Solución**:
+1. Ir a http://localhost:10013/wp-admin/options-permalink.php
+2. Click "Save Changes" sin cambiar nada
+3. Verificar plugin activado
+4. Probar endpoint: http://localhost:10013/wp-json/cdc/v1/
+
+---
+
+### Problema: "Saldo insuficiente" al registrar gasto
+
+**Causa**: Caja no tiene saldo o no está abierta
+
+**Solución**:
+```javascript
+// 1. Verificar balance
+CDCAPI.caja.balance().then(r => console.log(r));
+
+// 2. Si es $0, abrir caja
+CDCAPI.caja.abrirCaja({
+  monto_inicial: 10000,
+  responsable: "Admin"
+}).then(r => console.log(r));
+```
+
+---
+
+### Problema: Páginas muestran 404
+
+**Causa**: Páginas no creadas o permalinks incorrectos
+
+**Solución**:
+1. Ir a http://localhost:10013/verificar-paginas.php
+2. Si faltan páginas, ejecutar script de creación:
+   - WP Admin → Herramientas → Site Health
+   - O desactivar/reactivar tema
+
+---
+
+### Problema: Recibo no crea movimiento de caja
+
+**Causa**: Error en CajaService o ReciboService
+
+**Solución**:
+1. Revisar logs: `logs/php/error.log`
+2. Verificar que tabla `wp_cdc_movimientos_caja` exista
+3. Verificar balance de caja antes de crear recibo
+
+---
+
+### Problema: Balance de caja incorrecto
+
+**Causa**: Movimientos sin saldo calculado correctamente
+
+**Solución**:
+```sql
+-- Verificar movimientos
+SELECT * FROM wp_cdc_movimientos_caja ORDER BY id DESC LIMIT 10;
+
+-- Verificar que tengan saldo_anterior y saldo_nuevo
+SELECT id, tipo, monto, saldo_anterior, saldo_nuevo
+FROM wp_cdc_movimientos_caja
+WHERE saldo_nuevo IS NULL OR saldo_anterior IS NULL;
+```
+
+---
+
+## 📝 Checklist de Testing Completo
+
+Antes de marcar el sistema como "listo":
+
+### Backend
+- [ ] Plugin CDC API activado
+- [ ] 13 tablas custom creadas
+- [ ] Todos los endpoints responden (GET /wp-json/cdc/v1/)
+- [ ] Balance de caja calcula correctamente
+- [ ] Movimientos de caja se registran con saldo
+
+### Frontend
+- [ ] Tema CDC Sistema activado
+- [ ] 8 páginas del sistema creadas
+- [ ] Header y sidebar muestran correctamente
+- [ ] Notificaciones toast funcionan
 - [ ] No hay errores en consola del navegador
-- [ ] No hay errores en logs/php/error.log
 
-**Si todos los checks están ✅**, el sistema está listo para continuar con la implementación de las pantallas con API real.
+### Tests
+- [ ] Tests automatizados pasan (13/13)
+- [ ] Tests manuales completados exitosamente
+- [ ] Panel de diagnóstico muestra todo en verde
+- [ ] Verificador de páginas sin errores
+
+### Logs
+- [ ] No hay errores PHP en `logs/php/error.log`
+- [ ] No hay errores JavaScript en consola
+- [ ] No hay warnings de deprecated functions
 
 ---
 
-## Próximos Pasos
+## 📊 Métricas de Éxito
 
-Una vez completadas las pruebas exitosamente:
-1. Conectar página Personas con API real
-2. Crear formularios Nuevo Socio / Nuevo Cliente
-3. Implementar flujo completo de Cobrar
-4. Conectar Caja con movimientos reales
-5. Implementar resto de pantallas (Talleres, Eventos, Salas)
-6. Conectar Dashboard con datos reales
+### Métricas Cuantitativas
 
-**¡El sistema de autenticación está completo y listo para usar!**
+- **Tests automatizados**: 13/13 pasados (100%)
+- **Endpoints API**: 14+ endpoints funcionando
+- **Páginas creadas**: 8/8 (100%)
+- **Tablas DB**: 13/13 (100%)
+- **Cobertura de funcionalidades**: ~60% (Phase 1)
+
+### Métricas Cualitativas
+
+- Sistema carga sin errores
+- Navegación fluida entre páginas
+- API responde en < 500ms
+- UI renderiza correctamente
+- Sin memory leaks en navegador
+
+---
+
+**Última actualización**: 2026-01-19
+**Versión del sistema**: 0.1.0 (Phase 1)
+**Estado**: ✅ Sistema de testing completo y funcional
