@@ -87,53 +87,26 @@ jQuery(document).ready(function($) {
 
         $results.html('<p class="cdc-text-center cdc-text-muted">Cargando...</p>');
 
-        // TODO: Replace with actual API call
-        setTimeout(function() {
-            $results.html(`
-                <div class="cdc-table-wrapper">
-                    <table class="cdc-table">
-                        <thead>
-                            <tr>
-                                <th>Nombre</th>
-                                <th>Tipo</th>
-                                <th>DNI</th>
-                                <th>Teléfono</th>
-                                <th>Estado</th>
-                                <th>Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td colspan="6" class="cdc-text-center cdc-text-muted">
-                                    No hay personas registradas aún.<br>
-                                    <small>La lista se mostrará aquí una vez que se registren personas en el sistema.</small>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            `);
-        }, 300);
+        const filters = {};
+        if (currentFilter !== 'todos') {
+            filters.tipo = currentFilter; // 'socios' or 'clientes'
+        }
+        if (query && query.length >= 3) {
+            filters.query = query;
+        }
 
-        /* FUTURE IMPLEMENTATION:
-        $.ajax({
-            url: cdcData.apiUrl + 'personas',
-            method: 'GET',
-            data: {
-                tipo: currentFilter === 'todos' ? '' : currentFilter,
-                query: query
-            },
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('X-WP-Nonce', cdcData.nonce);
-            },
-            success: function(response) {
-                displayPersonas(response.data);
-            },
-            error: function() {
+        CDCAPI.personas.list(filters)
+            .then(function(response) {
+                if (response.success) {
+                    $results.html(CDC.renderPersonasTable(response.data));
+                } else {
+                    CDC.handleApiError(response, 'Load Personas');
+                }
+            })
+            .catch(function(error) {
                 $results.html('<p class="cdc-text-center" style="color: #d63638;">Error al cargar personas.</p>');
-            }
-        });
-        */
+                CDC.handleApiError(error, 'Load Personas');
+            });
     }
 
     // Initial load

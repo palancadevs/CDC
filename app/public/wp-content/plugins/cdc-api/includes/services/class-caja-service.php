@@ -259,4 +259,67 @@ class CDC_Caja_Service {
         $today = current_time('Y-m-d');
         return $this->get_cash_summary($today . ' 00:00:00', $today . ' 23:59:59');
     }
+
+    /**
+     * Create gasto (expense)
+     *
+     * @param array $data Expense data
+     * @return array Result
+     */
+    public function create_gasto($data) {
+        // Validate required fields
+        if (empty($data['monto']) || empty($data['descripcion'])) {
+            return array(
+                'success' => false,
+                'message' => 'Monto y descripción son requeridos',
+            );
+        }
+
+        // Calculate balance
+        $saldo_anterior = $this->get_current_balance();
+        $monto = floatval($data['monto']);
+        $saldo_nuevo = $saldo_anterior - $monto;
+
+        // Check if there's enough balance
+        if ($saldo_nuevo < 0) {
+            return array(
+                'success' => false,
+                'message' => 'Saldo insuficiente en caja',
+            );
+        }
+
+        global $wpdb;
+
+        // Prepare movement data with all required fields
+        $movement_data = array(
+            'fecha_movimiento' => isset($data['fecha_hora']) ? $data['fecha_hora'] : current_time('mysql'),
+            'tipo' => 'egreso',
+            'concepto' => $data['descripcion'],
+            'monto' => $monto,
+            'saldo_anterior' => $saldo_anterior,
+            'saldo_nuevo' => $saldo_nuevo,
+            'usuario_id' => get_current_user_id(),
+            'notas' => isset($data['observaciones']) ? $data['observaciones'] : null,
+        );
+
+        // Insert into movimientos_caja table
+        $result = $wpdb->insert(
+            $wpdb->prefix . 'cdc_movimientos_caja',
+            $movement_data,
+            array('%s', '%s', '%s', '%f', '%f', '%f', '%d', '%s')
+        );
+
+        if (!$result) {
+            return array(
+                'success' => false,
+                'message' => 'Error al registrar el gasto',
+            );
+        }
+
+        return array(
+            'success' => true,
+            'message' => 'Gasto registrado correctamente',
+            'data' => array('id' => $wpdb->insert_id, 'saldo_nuevo' => $saldo_nuevo),
+        );
+    }
 }

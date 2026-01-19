@@ -67,6 +67,33 @@ get_header();
 
 <script>
 jQuery(document).ready(function($) {
+    // Render talleres table
+    function renderTalleresTable(talleres) {
+        if (!talleres || talleres.length === 0) {
+            return `<div class="cdc-table-wrapper"><table class="cdc-table">
+                <thead><tr><th>Taller</th><th>Sala</th><th>Tallerista</th><th>Días y horarios</th><th>Precio</th><th>Estado</th><th>Acción</th></tr></thead>
+                <tbody><tr><td colspan="7" class="cdc-text-center cdc-text-muted">No hay talleres registrados.</td></tr></tbody>
+            </table></div>`;
+        }
+
+        let html = '<div class="cdc-table-wrapper"><table class="cdc-table"><thead><tr><th>Taller</th><th>Sala</th><th>Tallerista</th><th>Días y horarios</th><th>Precio</th><th>Estado</th><th>Acción</th></tr></thead><tbody>';
+
+        talleres.forEach(t => {
+            html += `<tr>
+                <td><strong>${t.nombre}</strong></td>
+                <td>${t.sala_nombre || '-'}</td>
+                <td>${t.tallerista_nombre || '-'}</td>
+                <td>${t.horarios || '-'}</td>
+                <td>$${CDC.formatCurrency(t.precio)}</td>
+                <td><span class="cdc-badge">${t.estado}</span></td>
+                <td><a href="${cdcData.homeUrl}/taller/${t.id}" class="cdc-button cdc-button-small">Ver</a></td>
+            </tr>`;
+        });
+
+        html += '</tbody></table></div>';
+        return html;
+    }
+
     // Load talleres
     function loadTalleres() {
         const query = $('#cdc-talleres-search').val();
@@ -76,37 +103,23 @@ jQuery(document).ready(function($) {
 
         $results.html('<p class="cdc-text-center cdc-text-muted">Cargando...</p>');
 
-        // TODO: Replace with actual API call
-        setTimeout(function() {
-            $results.html(`
-                <div class="cdc-table-wrapper">
-                    <table class="cdc-table">
-                        <thead>
-                            <tr>
-                                <th>Taller</th>
-                                <th>Sala</th>
-                                <th>Tallerista</th>
-                                <th>Días y horarios</th>
-                                <th>Precio</th>
-                                <th>Estado</th>
-                                <th>Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td colspan="7" class="cdc-text-center cdc-text-muted">
-                                    No hay talleres registrados aún.<br>
-                                    <small>Los talleres se mostrarán aquí una vez que se creen en el sistema.</small>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="cdc-pagination" style="display: none;">
-                    <span class="cdc-text-muted">Mostrando 1-0 de 0</span>
-                </div>
-            `);
-        }, 300);
+        const filters = {};
+        if (sala) filters.sala_id = sala;
+        if (estado && estado !== 'todos') filters.estado = estado;
+        if (query) filters.query = query;
+
+        CDCAPI.talleres.list(filters)
+            .then(function(response) {
+                if (response.success) {
+                    $results.html(renderTalleresTable(response.data));
+                } else {
+                    CDC.handleApiError(response, 'Load Talleres');
+                }
+            })
+            .catch(function(error) {
+                $results.html('<p class="cdc-text-center" style="color: #d63638;">Error al cargar talleres.</p>');
+                CDC.handleApiError(error, 'Load Talleres');
+            });
     }
 
     // Filter button

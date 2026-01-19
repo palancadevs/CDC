@@ -123,6 +123,62 @@ function cdc_create_required_pages() {
             'post_type'    => 'page',
             'page_template' => 'page-caja.php'
         ),
+        array(
+            'post_title'   => 'Nuevo Socio',
+            'post_name'    => 'nuevo-socio',
+            'post_content' => '',
+            'post_status'  => 'publish',
+            'post_type'    => 'page',
+            'page_template' => 'page-nuevo-socio.php'
+        ),
+        array(
+            'post_title'   => 'Nuevo Cliente',
+            'post_name'    => 'nuevo-cliente',
+            'post_content' => '',
+            'post_status'  => 'publish',
+            'post_type'    => 'page',
+            'page_template' => 'page-nuevo-cliente.php'
+        ),
+        array(
+            'post_title'   => 'Nuevo Taller',
+            'post_name'    => 'nuevo-taller',
+            'post_content' => '',
+            'post_status'  => 'publish',
+            'post_type'    => 'page',
+            'page_template' => 'page-nuevo-taller.php'
+        ),
+        array(
+            'post_title'   => 'Diagnóstico del Sistema',
+            'post_name'    => 'diagnostico',
+            'post_content' => '',
+            'post_status'  => 'publish',
+            'post_type'    => 'page',
+            'page_template' => 'page-diagnostico.php'
+        ),
+        array(
+            'post_title'   => 'Instalar Tablas',
+            'post_name'    => 'instalar-tablas',
+            'post_content' => '',
+            'post_status'  => 'publish',
+            'post_type'    => 'page',
+            'page_template' => 'page-instalar-tablas.php'
+        ),
+        array(
+            'post_title'   => 'Tests del Sistema',
+            'post_name'    => 'tests',
+            'post_content' => '',
+            'post_status'  => 'publish',
+            'post_type'    => 'page',
+            'page_template' => 'page-tests.php'
+        ),
+        array(
+            'post_title'   => 'Tests V2',
+            'post_name'    => 'tests-v2',
+            'post_content' => '',
+            'post_status'  => 'publish',
+            'post_type'    => 'page',
+            'page_template' => 'page-tests-v2.php'
+        ),
     );
 
     foreach ($pages as $page) {

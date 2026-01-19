@@ -35,6 +35,11 @@ class CDC_Movimiento_Caja extends CDC_Base_Model {
     );
 
     /**
+     * Date columns (only created_at, no updated_at)
+     */
+    protected $dates = array('created_at');
+
+    /**
      * Get movements by date range
      *
      * @param string $fecha_inicio Start date

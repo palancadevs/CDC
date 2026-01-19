@@ -78,6 +78,15 @@ class CDC_Caja_Controller extends CDC_Base_Controller {
                 'permission_callback' => array($this, 'check_auth'),
             ),
         ));
+
+        // POST /caja/gastos - Create expense
+        register_rest_route($this->namespace, '/' . $this->rest_base . '/gastos', array(
+            array(
+                'methods' => WP_REST_Server::CREATABLE,
+                'callback' => array($this, 'create_gasto'),
+                'permission_callback' => array($this, 'check_auth'),
+            ),
+        ));
     }
 
     /**
@@ -156,6 +165,23 @@ class CDC_Caja_Controller extends CDC_Base_Controller {
         $notas = isset($data['notas']) ? $data['notas'] : '';
 
         $result = $this->service->cierre_caja($notas);
+
+        if (!$result['success']) {
+            return $this->prepare_error($result['message'], 400);
+        }
+
+        return $this->prepare_response($result, 201);
+    }
+
+    /**
+     * Create gasto
+     *
+     * @param WP_REST_Request $request Request object
+     * @return WP_REST_Response|WP_Error
+     */
+    public function create_gasto($request) {
+        $data = $request->get_json_params();
+        $result = $this->service->create_gasto($data);
 
         if (!$result['success']) {
             return $this->prepare_error($result['message'], 400);

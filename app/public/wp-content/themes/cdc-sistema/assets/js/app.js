@@ -55,40 +55,18 @@
                 // Show loading state
                 $results.html('<p class="cdc-text-muted">Buscando...</p>');
 
-                // TODO: Replace with actual API call when cdc-api plugin is ready
-                // This is a placeholder for Phase 1
-                setTimeout(function() {
-                    $results.html(`
-                        <div class="cdc-search-placeholder">
-                            <p class="cdc-text-muted">
-                                <strong>Búsqueda:</strong> "${query}"
-                            </p>
-                            <p class="cdc-text-muted">
-                                La búsqueda estará disponible cuando se implemente el plugin cdc-api.
-                            </p>
-                            <p class="cdc-text-muted" style="font-size: 12px; margin-top: 10px;">
-                                <strong>Siguiente fase:</strong> Integración con REST API para búsqueda de personas por nombre, apellido o DNI.
-                            </p>
-                        </div>
-                    `);
-                }, 500);
-
-                /* FUTURE IMPLEMENTATION:
-                $.ajax({
-                    url: cdcData.apiUrl + 'personas/search',
-                    method: 'GET',
-                    data: { query: query },
-                    beforeSend: function(xhr) {
-                        xhr.setRequestHeader('X-WP-Nonce', cdcData.nonce);
-                    },
-                    success: function(response) {
-                        CDC.displaySearchResults(response.data);
-                    },
-                    error: function(xhr) {
-                        CDC.showNotification('Error al buscar. Por favor intente nuevamente.', 'error');
-                    }
-                });
-                */
+                // API call to search personas
+                CDCAPI.personas.search(query)
+                    .then(function(response) {
+                        if (response.success) {
+                            CDC.displaySearchResults(response.data);
+                        } else {
+                            CDC.handleApiError(response, 'Quick Search');
+                        }
+                    })
+                    .catch(function(error) {
+                        CDC.handleApiError(error, 'Quick Search');
+                    });
             });
 
             // Clear results when input is cleared
@@ -143,33 +121,21 @@
                 return;
             }
 
-            // TODO: Replace with actual API call when cdc-api plugin is ready
-            setTimeout(function() {
-                $container.html(`
-                    <p class="cdc-text-center cdc-text-muted">
-                        No hay movimientos registrados hoy.
-                    </p>
-                    <p class="cdc-text-center cdc-text-muted" style="font-size: 12px; margin-top: 10px;">
-                        Los movimientos se mostrarán aquí una vez que el módulo de Caja esté implementado.
-                    </p>
-                `);
-            }, 500);
+            $container.html('<p class="cdc-text-center cdc-text-muted">Cargando...</p>');
 
-            /* FUTURE IMPLEMENTATION:
-            $.ajax({
-                url: cdcData.apiUrl + 'movimientos/recientes',
-                method: 'GET',
-                beforeSend: function(xhr) {
-                    xhr.setRequestHeader('X-WP-Nonce', cdcData.nonce);
-                },
-                success: function(response) {
-                    CDC.displayRecentMovements(response.data);
-                },
-                error: function(xhr) {
+            // API call to get today's movements
+            CDCAPI.caja.movements()
+                .then(function(response) {
+                    if (response.success) {
+                        $container.html(CDC.renderMovementsTable(response.data));
+                    } else {
+                        CDC.handleApiError(response, 'Recent Movements');
+                    }
+                })
+                .catch(function(error) {
                     $container.html('<p class="cdc-text-center cdc-text-muted">Error al cargar movimientos.</p>');
-                }
-            });
-            */
+                    CDC.handleApiError(error, 'Recent Movements');
+                });
         },
 
         /**
@@ -245,6 +211,135 @@
                     $toast.remove();
                 }, 300);
             });
+        },
+
+        /**
+         * Handle API Error
+         * @param {object} error - Error object or response
+         * @param {string} context - Context where error occurred
+         */
+        handleApiError: function(error, context) {
+            const message = error.message || error.data?.message || 'Error en la solicitud';
+            this.showNotification(message, 'error');
+            console.error(`API Error [${context}]:`, error);
+        },
+
+        /**
+         * Show Loading Button State
+         * @param {jQuery} $button - Button element
+         * @param {boolean} loading - Whether to show loading state
+         */
+        showLoadingButton: function($button, loading) {
+            if (loading) {
+                $button.prop('disabled', true)
+                       .data('original-text', $button.html())
+                       .html('<span class="spinner"></span> Procesando...');
+            } else {
+                $button.prop('disabled', false)
+                       .html($button.data('original-text'));
+            }
+        },
+
+        /**
+         * Render Personas Table
+         * @param {Array} personas - Array of persona objects
+         * @return {string} HTML table
+         */
+        renderPersonasTable: function(personas) {
+            if (!personas || personas.length === 0) {
+                return '<p class="cdc-text-center cdc-text-muted">No se encontraron personas.</p>';
+            }
+
+            let html = `<div class="cdc-table-wrapper"><table class="cdc-table">
+                <thead><tr>
+                    <th>Nombre</th><th>Tipo</th><th>DNI</th>
+                    <th>Teléfono</th><th>Estado</th><th>Acción</th>
+                </tr></thead><tbody>`;
+
+            personas.forEach(p => {
+                const tipo = p.tipo === 'socio' ? 'Socio' : 'Cliente';
+                const estado = p.estado === 'activo' ?
+                    '<span class="cdc-badge cdc-badge-success">Activo</span>' :
+                    '<span class="cdc-badge cdc-badge-secondary">Inactivo</span>';
+
+                html += `<tr>
+                    <td><strong>${p.apellido}, ${p.nombre}</strong></td>
+                    <td>${tipo}</td>
+                    <td>${p.dni}</td>
+                    <td>${p.tel || '-'}</td>
+                    <td>${estado}</td>
+                    <td><a href="${cdcData.homeUrl}/persona/${p.id}" class="cdc-button cdc-button-small">Ver ficha</a></td>
+                </tr>`;
+            });
+
+            html += '</tbody></table></div>';
+            return html;
+        },
+
+        /**
+         * Render Movements Table
+         * @param {Array} movements - Array of movement objects
+         * @return {string} HTML table
+         */
+        renderMovementsTable: function(movements) {
+            if (!movements || movements.length === 0) {
+                return '<p class="cdc-text-center cdc-text-muted">No hay movimientos registrados hoy.</p>';
+            }
+
+            let html = '<table class="cdc-movements-table">';
+            html += '<thead><tr><th>Hora</th><th>Tipo</th><th>Concepto</th><th>Monto</th><th>Usuario</th></tr></thead>';
+            html += '<tbody>';
+
+            movements.forEach(mov => {
+                const tipo = mov.tipo === 'ingreso' ? 'Ingreso' : 'Egreso';
+                const clase = mov.tipo === 'ingreso' ? 'cdc-ingreso' : 'cdc-egreso';
+
+                html += `<tr>
+                    <td>${mov.hora}</td>
+                    <td><span class="${clase}">${tipo}</span></td>
+                    <td>${mov.concepto}</td>
+                    <td class="${clase}">$${CDC.formatCurrency(mov.monto)}</td>
+                    <td>${mov.usuario}</td>
+                </tr>`;
+            });
+
+            html += '</tbody></table>';
+            return html;
+        },
+
+        /**
+         * Render Person Search Results
+         * @param {Array} personas - Array of persona objects
+         * @param {Function} onSelectCallback - Callback when person is selected
+         * @return {string} HTML results
+         */
+        renderPersonSearchResults: function(personas, onSelectCallback) {
+            if (!personas || personas.length === 0) {
+                return '<p class="cdc-text-muted">No se encontraron personas.</p>';
+            }
+
+            let html = '<div class="cdc-person-search-results">';
+            personas.forEach(p => {
+                html += `<div class="cdc-person-result-item" data-person-id="${p.id}">
+                    <strong>${p.apellido}, ${p.nombre}</strong>
+                    <span class="cdc-text-muted"> - DNI: ${p.dni}</span>
+                    <span class="cdc-badge">${p.tipo === 'socio' ? 'Socio' : 'Cliente'}</span>
+                </div>`;
+            });
+            html += '</div>';
+
+            // Bind click events after rendering
+            setTimeout(() => {
+                $('.cdc-person-result-item').on('click', function() {
+                    const personId = $(this).data('person-id');
+                    const person = personas.find(p => p.id == personId);
+                    if (person && onSelectCallback) {
+                        onSelectCallback(person);
+                    }
+                });
+            }, 100);
+
+            return html;
         },
 
         /**

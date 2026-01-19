@@ -118,32 +118,57 @@ jQuery(document).ready(function($) {
 
         const fecha = $('#cdc-fecha').val();
         const hora = $('#cdc-hora').val();
-        const monto = $('#cdc-monto').val();
+        const monto = parseFloat($('#cdc-monto').val());
         const descripcion = $('#cdc-descripcion').val();
         const categoria = $('#cdc-categoria').val();
         const medio_pago = $('#cdc-medio-pago').val();
         const observaciones = $('#cdc-observaciones').val();
 
+        // Validation
         if (!monto || monto <= 0) {
-            alert('Por favor ingrese un monto válido');
+            CDC.showNotification('Ingrese un monto válido', 'warning');
             return;
         }
 
         if (!descripcion) {
-            alert('Por favor ingrese una descripción del gasto');
+            CDC.showNotification('Ingrese una descripción', 'warning');
             return;
         }
 
         if (!medio_pago) {
-            alert('Por favor seleccione un medio de pago');
+            CDC.showNotification('Seleccione un medio de pago', 'warning');
             return;
         }
 
-        // TODO: Process via API
-        alert(`Gasto registrado:\nFecha: ${fecha} ${hora}\nMonto: $${monto}\nDescripción: ${descripcion}`);
+        const $submitBtn = $(this).find('button[type="submit"]');
+        CDC.showLoadingButton($submitBtn, true);
 
-        // Redirect to home
-        window.location.href = cdcData.homeUrl;
+        const data = {
+            fecha_hora: `${fecha} ${hora}`,
+            tipo: 'egreso',
+            monto: monto,
+            descripcion: descripcion,
+            categoria: categoria,
+            medio_pago: medio_pago,
+            observaciones: observaciones
+        };
+
+        CDCAPI.caja.createGasto(data)
+            .then(function(response) {
+                CDC.showLoadingButton($submitBtn, false);
+                if (response.success) {
+                    CDC.showNotification('Gasto registrado exitosamente', 'success');
+                    setTimeout(function() {
+                        window.location.href = cdcData.homeUrl;
+                    }, 1500);
+                } else {
+                    CDC.handleApiError(response, 'Expense Registration');
+                }
+            })
+            .catch(function(error) {
+                CDC.showLoadingButton($submitBtn, false);
+                CDC.handleApiError(error, 'Expense Registration');
+            });
     });
 });
 </script>

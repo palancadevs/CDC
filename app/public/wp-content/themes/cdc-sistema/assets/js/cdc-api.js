@@ -215,6 +215,15 @@
              */
             cierre: function(data) {
                 return CDCAPI.request('caja/cierre', 'POST', data);
+            },
+
+            /**
+             * Create expense (gasto)
+             * @param {object} data Expense data
+             * @return {Promise}
+             */
+            createGasto: function(data) {
+                return CDCAPI.request('caja/gastos', 'POST', data);
             }
         },
 
@@ -224,10 +233,12 @@
         talleres: {
             /**
              * List talleres
+             * @param {object} filters Filter parameters (query, sala_id, estado)
              * @return {Promise}
              */
-            list: function() {
-                return CDCAPI.request('talleres');
+            list: function(filters) {
+                filters = filters || {};
+                return CDCAPI.request('talleres', 'GET', filters);
             },
 
             /**

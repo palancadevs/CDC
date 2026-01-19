@@ -166,24 +166,26 @@ jQuery(document).ready(function($) {
         const $results = $('#cdc-person-results');
 
         if (query.length < 3) {
-            alert('Por favor ingrese al menos 3 caracteres');
+            CDC.showNotification('Por favor ingrese al menos 3 caracteres', 'warning');
             return;
         }
 
         $results.html('<p class="cdc-text-muted">Buscando...</p>');
 
-        // TODO: Replace with actual API call
-        setTimeout(function() {
-            $results.html(`
-                <p class="cdc-text-muted">
-                    No se encontraron personas.<br>
-                    <small>La búsqueda estará disponible cuando haya personas registradas en el sistema.</small>
-                </p>
-            `);
-        }, 300);
+        CDCAPI.personas.search(query)
+            .then(function(response) {
+                if (response.success) {
+                    $results.html(CDC.renderPersonSearchResults(response.data, selectPerson));
+                } else {
+                    CDC.handleApiError(response, 'Person Search');
+                }
+            })
+            .catch(function(error) {
+                CDC.handleApiError(error, 'Person Search');
+            });
     }
 
-    // Select person (placeholder)
+    // Select person
     function selectPerson(person) {
         selectedPerson = person;
         $('#cdc-selected-person-info').html(
@@ -201,31 +203,74 @@ jQuery(document).ready(function($) {
         }, 500);
     }
 
+    // Helper function to get concepto by type
+    function getConceptoByType(type) {
+        const map = {
+            'cuota-socio': 'Cuota Socio',
+            'cuota-taller': 'Cuota Taller',
+            'entrada-evento': 'Entrada Evento',
+            'alquiler-sala': 'Alquiler Sala',
+            'otro-ingreso': 'Otro Ingreso'
+        };
+        return map[type] || 'Cobro';
+    }
+
     // Step 3: Submit payment
     $('#cdc-payment-form').on('submit', function(e) {
         e.preventDefault();
 
-        const monto = $('#cdc-monto').val();
+        const monto = parseFloat($('#cdc-monto').val());
         const medio_pago = $('input[name="medio_pago"]:checked').val();
         const observaciones = $('#cdc-observaciones').val();
 
         if (!monto || monto <= 0) {
-            alert('Por favor ingrese un monto válido');
+            CDC.showNotification('Ingrese un monto válido', 'warning');
             return;
         }
 
-        // TODO: Process payment via API
-        alert(`Cobro registrado:\nTipo: ${selectedType}\nMonto: $${monto}\nMedio: ${medio_pago}`);
+        if (!selectedPerson) {
+            CDC.showNotification('Seleccione una persona', 'warning');
+            return;
+        }
 
-        // Reset form
-        window.location.reload();
+        const $submitBtn = $(this).find('button[type="submit"]');
+        CDC.showLoadingButton($submitBtn, true);
+
+        const data = {
+            persona_id: selectedPerson.id,
+            tipo: selectedType,
+            items: [{
+                descripcion: getConceptoByType(selectedType),
+                cantidad: 1,
+                precio_unitario: monto,
+                subtotal: monto
+            }],
+            concepto: getConceptoByType(selectedType),
+            metodo_pago: medio_pago,
+            notas: observaciones
+        };
+
+        CDCAPI.recibos.create(data)
+            .then(function(response) {
+                CDC.showLoadingButton($submitBtn, false);
+                if (response.success) {
+                    CDC.showNotification('Cobro registrado exitosamente', 'success');
+                    setTimeout(function() {
+                        window.location.href = cdcData.homeUrl;
+                    }, 1500);
+                } else {
+                    CDC.handleApiError(response, 'Payment Processing');
+                }
+            })
+            .catch(function(error) {
+                CDC.showLoadingButton($submitBtn, false);
+                CDC.handleApiError(error, 'Payment Processing');
+            });
     });
 
     // Cancel button
     $('#cdc-cancel-btn').on('click', function() {
-        if (confirm('¿Está seguro que desea cancelar?')) {
-            window.location.reload();
-        }
+        window.location.href = cdcData.homeUrl;
     });
 });
 </script>

@@ -11,21 +11,29 @@ if (!defined('ABSPATH')) {
 
 // Get current persona data
 $persona = cdc_get_current_persona();
-$user_name = $persona ? $persona->nombre . ' ' . $persona->apellido : 'Usuario';
 
-// Determine role based on persona type
-$user_role = 'Usuario';
-if ($persona) {
-    switch ($persona->tipo) {
-        case 'socio':
-            $user_role = 'Socio';
-            break;
-        case 'cliente':
-            $user_role = 'Cliente';
-            break;
-        case 'ambos':
-            $user_role = 'Socio/Cliente';
-            break;
+// PHASE 1: If no persona, use WordPress user data
+if (!$persona && is_user_logged_in()) {
+    $current_user = wp_get_current_user();
+    $user_name = $current_user->display_name ?: 'Usuario';
+    $user_role = 'Administrador';
+} else {
+    $user_name = $persona ? $persona->nombre . ' ' . $persona->apellido : 'Usuario';
+
+    // Determine role based on persona type
+    $user_role = 'Usuario';
+    if ($persona) {
+        switch ($persona->tipo) {
+            case 'socio':
+                $user_role = 'Socio';
+                break;
+            case 'cliente':
+                $user_role = 'Cliente';
+                break;
+            case 'ambos':
+                $user_role = 'Socio/Cliente';
+                break;
+        }
     }
 }
 ?>
