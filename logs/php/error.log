@@ -1,0 +1,164 @@
+[14-Jan-2026 19:03:59 UTC] PHP Warning:  require_once(/Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/plugins/cdc-admin/includes/admin-pages/personas-page.php): Failed to open stream: No such file or directory in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/plugins/cdc-admin/cdc-admin.php on line 116
+[14-Jan-2026 19:03:59 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/plugins/cdc-admin/includes/admin-pages/personas-page.php' (include_path='.:/usr/share/php:/www/wp-content/pear') in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/plugins/cdc-admin/cdc-admin.php:116
+Stack trace:
+#0 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/plugins/cdc-admin/cdc-admin.php(70): CDC_Admin->load_dependencies()
+#1 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/plugins/cdc-admin/cdc-admin.php(60): CDC_Admin->__construct()
+#2 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/plugins/cdc-admin/cdc-admin.php(283): CDC_Admin::get_instance()
+#3 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/plugins/cdc-admin/cdc-admin.php(287): cdc_admin_init()
+#4 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-admin/includes/plugin.php(2400): include_once('/Users/joanrome...')
+#5 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-admin/includes/plugin.php(673): plugin_sandbox_scrape('cdc-admin/cdc-a...')
+#6 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-admin/plugins.php(60): activate_plugin('cdc-admin/cdc-a...', 'http://localhos...', false)
+#7 {main}
+  thrown in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/plugins/cdc-admin/cdc-admin.php on line 116
+[14-Jan-2026 19:04:14 UTC] PHP Warning:  require_once(/Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/plugins/cdc-admin/includes/admin-pages/personas-page.php): Failed to open stream: No such file or directory in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/plugins/cdc-admin/cdc-admin.php on line 116
+[14-Jan-2026 19:04:14 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/plugins/cdc-admin/includes/admin-pages/personas-page.php' (include_path='.:/usr/share/php:/www/wp-content/pear') in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/plugins/cdc-admin/cdc-admin.php:116
+Stack trace:
+#0 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/plugins/cdc-admin/cdc-admin.php(70): CDC_Admin->load_dependencies()
+#1 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/plugins/cdc-admin/cdc-admin.php(60): CDC_Admin->__construct()
+#2 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/plugins/cdc-admin/cdc-admin.php(283): CDC_Admin::get_instance()
+#3 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/plugins/cdc-admin/cdc-admin.php(287): cdc_admin_init()
+#4 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-admin/includes/plugin.php(2400): include_once('/Users/joanrome...')
+#5 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-admin/includes/plugin.php(673): plugin_sandbox_scrape('cdc-admin/cdc-a...')
+#6 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-admin/plugins.php(60): activate_plugin('cdc-admin/cdc-a...', 'http://localhos...', false)
+#7 {main}
+  thrown in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/plugins/cdc-admin/cdc-admin.php on line 116
+[14-Jan-2026 19:04:29 UTC] PHP Warning:  require_once(/Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/plugins/cdc-admin/includes/admin-pages/personas-page.php): Failed to open stream: No such file or directory in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/plugins/cdc-admin/cdc-admin.php on line 116
+[14-Jan-2026 19:04:29 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/plugins/cdc-admin/includes/admin-pages/personas-page.php' (include_path='.:/usr/share/php:/www/wp-content/pear') in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/plugins/cdc-admin/cdc-admin.php:116
+Stack trace:
+#0 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/plugins/cdc-admin/cdc-admin.php(70): CDC_Admin->load_dependencies()
+#1 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/plugins/cdc-admin/cdc-admin.php(60): CDC_Admin->__construct()
+#2 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/plugins/cdc-admin/cdc-admin.php(283): CDC_Admin::get_instance()
+#3 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/plugins/cdc-admin/cdc-admin.php(287): cdc_admin_init()
+#4 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-admin/includes/plugin.php(2400): include_once('/Users/joanrome...')
+#5 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-admin/includes/plugin.php(673): plugin_sandbox_scrape('cdc-admin/cdc-a...')
+#6 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-admin/plugins.php(60): activate_plugin('cdc-admin/cdc-a...', 'http://localhos...', false)
+#7 {main}
+  thrown in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/plugins/cdc-admin/cdc-admin.php on line 116
+[14-Jan-2026 19:05:27 UTC] PHP Warning:  require_once(/Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/plugins/cdc-admin/includes/admin-pages/personas-page.php): Failed to open stream: No such file or directory in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/plugins/cdc-admin/cdc-admin.php on line 116
+[14-Jan-2026 19:05:27 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/plugins/cdc-admin/includes/admin-pages/personas-page.php' (include_path='.:/usr/share/php:/www/wp-content/pear') in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/plugins/cdc-admin/cdc-admin.php:116
+Stack trace:
+#0 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/plugins/cdc-admin/cdc-admin.php(70): CDC_Admin->load_dependencies()
+#1 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/plugins/cdc-admin/cdc-admin.php(60): CDC_Admin->__construct()
+#2 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/plugins/cdc-admin/cdc-admin.php(283): CDC_Admin::get_instance()
+#3 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/plugins/cdc-admin/cdc-admin.php(287): cdc_admin_init()
+#4 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-admin/includes/plugin.php(2400): include_once('/Users/joanrome...')
+#5 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-admin/includes/plugin.php(673): plugin_sandbox_scrape('cdc-admin/cdc-a...')
+#6 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-admin/plugins.php(60): activate_plugin('cdc-admin/cdc-a...', 'http://localhos...', false)
+#7 {main}
+  thrown in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/plugins/cdc-admin/cdc-admin.php on line 116
+[16-Jan-2026 18:20:41 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php on line 109
+[16-Jan-2026 18:21:42 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php on line 109
+[16-Jan-2026 18:22:39 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php on line 109
+[16-Jan-2026 18:23:40 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php on line 109
+[16-Jan-2026 18:25:11 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php on line 109
+[16-Jan-2026 18:25:40 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php on line 109
+[16-Jan-2026 18:27:12 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php on line 109
+[16-Jan-2026 18:27:41 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php on line 109
+[16-Jan-2026 18:29:13 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php on line 109
+[16-Jan-2026 18:29:42 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php on line 109
+[16-Jan-2026 18:31:14 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php on line 109
+[16-Jan-2026 18:31:43 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php on line 109
+[16-Jan-2026 18:33:15 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php on line 109
+[16-Jan-2026 18:33:44 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php on line 109
+[16-Jan-2026 18:35:16 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php on line 109
+[16-Jan-2026 18:35:45 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php on line 109
+[16-Jan-2026 18:37:17 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php on line 109
+[16-Jan-2026 18:37:46 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php on line 109
+[16-Jan-2026 18:39:18 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php on line 109
+[16-Jan-2026 18:39:47 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php on line 109
+[16-Jan-2026 18:41:19 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php on line 109
+[16-Jan-2026 18:41:48 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php on line 109
+[16-Jan-2026 18:43:20 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php on line 109
+[16-Jan-2026 18:43:49 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php on line 109
+[16-Jan-2026 18:45:21 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php on line 109
+[16-Jan-2026 18:45:50 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php on line 109
+[16-Jan-2026 18:47:22 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php on line 109
+[16-Jan-2026 18:47:51 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php on line 109
+[16-Jan-2026 18:49:23 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php on line 109
+[16-Jan-2026 18:49:52 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php on line 109
+[16-Jan-2026 18:51:24 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php on line 109
+[16-Jan-2026 18:51:53 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php on line 109
+[16-Jan-2026 18:53:25 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php on line 109
+[16-Jan-2026 18:53:54 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php on line 109
+[16-Jan-2026 18:55:26 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php on line 109
+[16-Jan-2026 18:55:55 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php on line 109
+[16-Jan-2026 18:57:27 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php on line 109
+[16-Jan-2026 18:57:56 UTC] PHP Warning:  require_once(/Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/includes/auth.php): Failed to open stream: No such file or directory in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php on line 19
+[16-Jan-2026 18:57:56 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/includes/auth.php' (include_path='.:/usr/share/php:/www/wp-content/pear') in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php:19
+Stack trace:
+#0 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-settings.php(710): include()
+#1 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-config.php(103): require_once('/Users/joanrome...')
+#2 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-load.php(50): require_once('/Users/joanrome...')
+#3 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-admin/admin-ajax.php(22): require_once('/Users/joanrome...')
+#4 {main}
+  thrown in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php on line 19
+[16-Jan-2026 18:57:56 UTC] PHP Warning:  Trying to access array offset on value of type bool in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-includes/class-wp-recovery-mode-email-service.php on line 367
+[16-Jan-2026 18:57:56 UTC] PHP Warning:  Trying to access array offset on value of type bool in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-includes/class-wp-recovery-mode-email-service.php on line 368
+[16-Jan-2026 18:58:00 UTC] PHP Warning:  require_once(/Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/includes/auth.php): Failed to open stream: No such file or directory in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php on line 19
+[16-Jan-2026 18:58:00 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/includes/auth.php' (include_path='.:/usr/share/php:/www/wp-content/pear') in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php:19
+Stack trace:
+#0 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-settings.php(710): include()
+#1 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-config.php(103): require_once('/Users/joanrome...')
+#2 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-load.php(50): require_once('/Users/joanrome...')
+#3 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-admin/admin-ajax.php(22): require_once('/Users/joanrome...')
+#4 {main}
+  thrown in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/functions.php on line 19
+[16-Jan-2026 19:10:32 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function cdc_is_user_logged_in() in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/index.php:16
+Stack trace:
+#0 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-includes/template-loader.php(125): include()
+#1 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-blog-header.php(19): require_once('/Users/joanrome...')
+#2 /Users/joanromero/Local Sites/cdc-gestion/app/public/index.php(17): require('/Users/joanrome...')
+#3 {main}
+  thrown in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/index.php on line 16
+[16-Jan-2026 19:10:39 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function cdc_is_user_logged_in() in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/index.php:16
+Stack trace:
+#0 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-includes/template-loader.php(125): include()
+#1 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-blog-header.php(19): require_once('/Users/joanrome...')
+#2 /Users/joanromero/Local Sites/cdc-gestion/app/public/index.php(17): require('/Users/joanrome...')
+#3 {main}
+  thrown in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/index.php on line 16
+[16-Jan-2026 19:10:43 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function cdc_is_user_logged_in() in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/index.php:16
+Stack trace:
+#0 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-includes/template-loader.php(125): include()
+#1 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-blog-header.php(19): require_once('/Users/joanrome...')
+#2 /Users/joanromero/Local Sites/cdc-gestion/app/public/index.php(17): require('/Users/joanrome...')
+#3 {main}
+  thrown in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/index.php on line 16
+[16-Jan-2026 19:29:54 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function cdc_is_user_logged_in() in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/index.php:16
+Stack trace:
+#0 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-includes/template-loader.php(125): include()
+#1 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-blog-header.php(19): require_once('/Users/joanrome...')
+#2 /Users/joanromero/Local Sites/cdc-gestion/app/public/index.php(17): require('/Users/joanrome...')
+#3 {main}
+  thrown in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/index.php on line 16
+[16-Jan-2026 19:30:55 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function cdc_is_user_logged_in() in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/index.php:16
+Stack trace:
+#0 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-includes/template-loader.php(125): include()
+#1 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-blog-header.php(19): require_once('/Users/joanrome...')
+#2 /Users/joanromero/Local Sites/cdc-gestion/app/public/index.php(17): require('/Users/joanrome...')
+#3 {main}
+  thrown in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/index.php on line 16
+[16-Jan-2026 19:31:13 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function cdc_is_user_logged_in() in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/index.php:16
+Stack trace:
+#0 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-includes/template-loader.php(125): include()
+#1 /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-blog-header.php(19): require_once('/Users/joanrome...')
+#2 /Users/joanromero/Local Sites/cdc-gestion/app/public/index.php(17): require('/Users/joanrome...')
+#3 {main}
+  thrown in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/index.php on line 16
+[16-Jan-2026 20:02:05 UTC] PHP Warning:  require_once(../../../../../wp-load.php): Failed to open stream: No such file or directory in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/create-pages.php on line 9
+[16-Jan-2026 20:02:05 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '../../../../../wp-load.php' (include_path='.:/usr/share/php:/www/wp-content/pear') in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/create-pages.php:9
+Stack trace:
+#0 {main}
+  thrown in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/create-pages.php on line 9
+[16-Jan-2026 20:03:28 UTC] PHP Warning:  require_once(../../../../../wp-load.php): Failed to open stream: No such file or directory in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/create-pages.php on line 9
+[16-Jan-2026 20:03:28 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '../../../../../wp-load.php' (include_path='.:/usr/share/php:/www/wp-content/pear') in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/create-pages.php:9
+Stack trace:
+#0 {main}
+  thrown in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/create-pages.php on line 9
+[16-Jan-2026 20:07:27 UTC] PHP Warning:  require_once(../../../../../wp-load.php): Failed to open stream: No such file or directory in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/diagnostico.php on line 8
+[16-Jan-2026 20:07:27 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '../../../../../wp-load.php' (include_path='.:/usr/share/php:/www/wp-content/pear') in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/diagnostico.php:8
+Stack trace:
+#0 {main}
+  thrown in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/diagnostico.php on line 8
+[16-Jan-2026 22:15:13 UTC] Cron reschedule event error for hook: action_scheduler_run_queue, Error code: could_not_set, Error message: The cron event list could not be saved., Data: {"schedule":"every_minute","args":["WP Cron"],"interval":60}
+[16-Jan-2026 22:15:13 UTC] Cron unschedule event error for hook: action_scheduler_run_queue, Error code: could_not_set, Error message: The cron event list could not be saved., Data: {"schedule":"every_minute","args":["WP Cron"],"interval":60}

@@ -6,7 +6,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is "CDC Gestión" - a **custom frontend application** built on WordPress + WooCommerce for Casa de la Cultura (Cultural Center). The system handles members (socios), clients, workshops (talleres), events, room rentals (alquiler de salas), cash flow, and automatic invoicing through ARCA.
 
-**IMPORTANT:** This is a **frontend-only system** (NOT wp-admin). The entire public site is the management application.
+**CRITICAL ARCHITECTURE:**
+- This is a **FRONTEND SYSTEM** - the entire public WordPress site (http://localhost:10013/) IS the management application
+- **NOT a wp-admin plugin** - users access the system by visiting the homepage
+- **NO LOGIN/AUTHENTICATION** in Phase 1 - the system is open for testing and development
+- Authentication and role-based permissions will be added in a future phase
+- The home page displays the Dashboard screen from the mockups directly
 
 **Technology Stack:**
 - WordPress 6.8+ with WooCommerce 10.4.3
@@ -75,35 +80,68 @@ The system uses custom tables (not WordPress custom post types) for financial da
 - cdc_evento, cdc_entrada_evento
 - cdc_sala, cdc_tallerista
 
-### Role-Based Access Control
+### Role-Based Access Control (FUTURE PHASE)
 
-**Admin**: Full system access
-**Tesorería (Treasury)**: Edit catalogs/rates, void transactions, retry invoicing
-**Recepción (Reception)**: Create persons, register payments/expenses (per configuration)
+**IMPORTANT:** Authentication and roles are NOT implemented in Phase 1. The system is currently open without login.
 
-All critical actions must log: user_id + timestamp
+When implemented in the future:
+- **Admin**: Full system access
+- **Tesorería (Treasury)**: Edit catalogs/rates, void transactions, retry invoicing
+- **Recepción (Reception)**: Create persons, register payments/expenses (per configuration)
+- All critical actions must log: user_id + timestamp
 
-## Plugin Structure
+## System Architecture
 
-**Primary custom plugin: `cdc-admin`** (to be created in `wp-content/plugins/cdc-admin/`)
+The system is split into two components:
+
+### 1. Frontend Theme: `cdc-sistema`
+Located in `wp-content/themes/cdc-sistema/`
 
 ```
-cdc-admin/
-├── cdc-admin.php (main plugin file)
-├── includes/
-│   ├── admin-pages/     # UI pages (Inicio, Personas, Ficha, Caja, Cobrar, etc.)
-│   ├── services/        # Business logic
-│   │   ├── PersonasService.php
-│   │   ├── CajaService.php
-│   │   ├── CobrosService.php
-│   │   ├── FacturacionService.php
-│   │   └── MercadoPagoService.php
-│   ├── models/          # Database models
-│   └── rest-api/        # WP REST API endpoints
+cdc-sistema/
+├── style.css              # Theme metadata
+├── functions.php          # Theme setup and helpers
+├── header.php             # Top bar with navigation
+├── sidebar.php            # Left sidebar menu
+├── footer.php             # Footer wrapper
+├── front-page.php         # Home/Dashboard (root URL)
+├── page-personas.php      # Personas list
+├── page-cobrar.php        # Payment collection
+├── page-talleres.php      # Workshops management
+├── page-salas.php         # Room rentals
+├── single-persona.php     # Person profile (ficha)
 ├── assets/
-│   ├── css/
-│   └── js/
-└── templates/
+│   ├── css/main.css       # All styles
+│   └── js/app.js          # Frontend JavaScript
+└── includes/
+    └── enqueue.php        # Asset loading
+```
+
+### 2. Backend Plugin: `cdc-api`
+Located in `wp-content/plugins/cdc-api/`
+
+```
+cdc-api/
+├── cdc-api.php            # Main plugin file
+├── includes/
+│   ├── database/
+│   │   └── schema.php     # 13 custom tables
+│   ├── models/            # Database models
+│   │   ├── class-base-model.php
+│   │   ├── class-persona.php
+│   │   ├── class-socio.php
+│   │   ├── class-recibo.php
+│   │   └── ... (10 models)
+│   ├── services/          # Business logic
+│   │   ├── class-persona-service.php
+│   │   ├── class-caja-service.php
+│   │   ├── class-recibo-service.php
+│   │   └── ... (6 services)
+│   └── rest/              # REST API controllers
+│       ├── class-base-controller.php
+│       ├── class-personas-controller.php
+│       ├── class-recibos-controller.php
+│       └── ... (6 controllers)
 ```
 
 ### REST API Endpoints
@@ -228,8 +266,10 @@ wp cache flush
 mysql -u root -proot local
 ```
 
-**Activate custom plugin (after creation):**
-Navigate to WP Admin > Plugins > Activate `cdc-admin`
+**Activate theme and plugin:**
+1. WP Admin > Appearance > Themes > Activate `CDC Sistema`
+2. WP Admin > Plugins > Activate `CDC API`
+3. Visit homepage: http://localhost:10013/
 
 ## Important Notes
 

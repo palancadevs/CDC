@@ -1,0 +1,240 @@
+/**
+ * CDC Sistema - Notifications & Loading States
+ *
+ * @package CDC_Sistema
+ */
+
+/* ==========================================================================
+   Toast Notifications
+   ========================================================================== */
+
+.cdc-toast {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    min-width: 300px;
+    max-width: 500px;
+    padding: 15px 20px;
+    background: #fff;
+    border-left: 4px solid;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    opacity: 0;
+    transform: translateX(400px);
+    transition: all 0.3s ease-in-out;
+    z-index: 99999;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.cdc-toast.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.cdc-toast .dashicons {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.cdc-toast-message {
+    flex: 1;
+    color: #2c3338;
+}
+
+.cdc-toast-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    line-height: 1;
+    color: #646970;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    transition: color 0.2s;
+}
+
+.cdc-toast-close:hover {
+    color: #2c3338;
+}
+
+/* Toast types */
+.cdc-toast-success {
+    border-color: #28a745;
+}
+
+.cdc-toast-success .dashicons {
+    color: #28a745;
+}
+
+.cdc-toast-error {
+    border-color: #d63638;
+}
+
+.cdc-toast-error .dashicons {
+    color: #d63638;
+}
+
+.cdc-toast-warning {
+    border-color: #f59e0b;
+}
+
+.cdc-toast-warning .dashicons {
+    color: #f59e0b;
+}
+
+.cdc-toast-info {
+    border-color: #0073aa;
+}
+
+.cdc-toast-info .dashicons {
+    color: #0073aa;
+}
+
+/* Multiple toasts stacking */
+.cdc-toast:nth-child(2) {
+    top: 160px;
+}
+
+.cdc-toast:nth-child(3) {
+    top: 240px;
+}
+
+.cdc-toast:nth-child(4) {
+    top: 320px;
+}
+
+/* ==========================================================================
+   Loading States
+   ========================================================================== */
+
+.cdc-loading {
+    text-align: center;
+    padding: 60px 20px;
+    color: #646970;
+}
+
+.cdc-loading .spinner {
+    border: 4px solid #f0f0f1;
+    border-top-color: #0073aa;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 20px;
+    animation: cdc-spin 0.8s linear infinite;
+}
+
+.cdc-loading p {
+    margin: 0;
+    font-size: 14px;
+    color: #646970;
+}
+
+@keyframes cdc-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Inline loader (for buttons) */
+.cdc-loader-inline {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: cdc-spin 0.6s linear infinite;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
+/* Button loading state */
+.cdc-button.loading {
+    position: relative;
+    color: transparent;
+    pointer-events: none;
+}
+
+.cdc-button.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -10px;
+    margin-top: -10px;
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: cdc-spin 0.6s linear infinite;
+}
+
+/* ==========================================================================
+   Skeleton Loaders
+   ========================================================================== */
+
+.cdc-skeleton {
+    background: linear-gradient(90deg, #f0f0f1 25%, #e0e0e0 50%, #f0f0f1 75%);
+    background-size: 200% 100%;
+    animation: cdc-skeleton-loading 1.5s ease-in-out infinite;
+    border-radius: 4px;
+}
+
+.cdc-skeleton-text {
+    height: 14px;
+    margin-bottom: 8px;
+}
+
+.cdc-skeleton-title {
+    height: 24px;
+    width: 60%;
+    margin-bottom: 16px;
+}
+
+.cdc-skeleton-card {
+    height: 120px;
+    margin-bottom: 16px;
+}
+
+@keyframes cdc-skeleton-loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media (max-width: 768px) {
+    .cdc-toast {
+        left: 20px;
+        right: 20px;
+        min-width: auto;
+        max-width: none;
+        transform: translateY(-100px);
+    }
+
+    .cdc-toast.show {
+        transform: translateY(0);
+    }
+
+    .cdc-toast:nth-child(2),
+    .cdc-toast:nth-child(3),
+    .cdc-toast:nth-child(4) {
+        top: auto;
+    }
+}
