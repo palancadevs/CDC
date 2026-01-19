@@ -84,7 +84,8 @@ function cdc_check_authentication() {
         exit;
     }
 }
-add_action('template_redirect', 'cdc_check_authentication');
+// DISABLED FOR PHASE 1 - No authentication required during development
+// add_action('template_redirect', 'cdc_check_authentication');
 
 /**
  * Modify logout redirect URL
