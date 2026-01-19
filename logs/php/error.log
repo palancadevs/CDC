@@ -160,3 +160,5 @@ Stack trace:
 Stack trace:
 #0 {main}
   thrown in /Users/joanromero/Local Sites/cdc-gestion/app/public/wp-content/themes/cdc-sistema/diagnostico.php on line 8
+[16-Jan-2026 22:15:13 UTC] Cron reschedule event error for hook: action_scheduler_run_queue, Error code: could_not_set, Error message: The cron event list could not be saved., Data: {"schedule":"every_minute","args":["WP Cron"],"interval":60}
+[16-Jan-2026 22:15:13 UTC] Cron unschedule event error for hook: action_scheduler_run_queue, Error code: could_not_set, Error message: The cron event list could not be saved., Data: {"schedule":"every_minute","args":["WP Cron"],"interval":60}
