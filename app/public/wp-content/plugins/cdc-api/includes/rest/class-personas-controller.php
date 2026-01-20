@@ -94,13 +94,62 @@ class CDC_Personas_Controller extends CDC_Base_Controller {
      * @return WP_REST_Response
      */
     public function get_items($request) {
-        $persona_model = new CDC_Persona();
-
+        // Build query args
         $args = array(
             'limit' => $request->get_param('per_page') ?: 50,
             'offset' => $request->get_param('offset') ?: 0,
         );
 
+        // Filter by tipo (socio/cliente)
+        $tipo = $request->get_param('tipo');
+        if ($tipo && in_array($tipo, array('socio', 'cliente'))) {
+            $args['tipo'] = $tipo;
+        }
+
+        // Filter by estado (activo/inactivo)
+        $estado = $request->get_param('estado');
+        if ($estado && in_array($estado, array('activo', 'inactivo'))) {
+            $args['estado'] = $estado;
+        }
+
+        // Search query
+        $query = $request->get_param('query');
+        if ($query && strlen($query) >= 3) {
+            // Use search instead of get_all
+            $personas = $this->service->search_personas($query);
+
+            // Apply tipo filter to search results if needed
+            if ($tipo) {
+                $personas = array_filter($personas, function($p) use ($tipo) {
+                    return $p['tipo'] === $tipo;
+                });
+                $personas = array_values($personas); // Reindex array
+            }
+
+            return $this->prepare_response(array(
+                'success' => true,
+                'data' => $personas,
+            ));
+        }
+
+        // Build WHERE clause for filters
+        $where_clauses = array();
+
+        if (isset($args['tipo'])) {
+            global $wpdb;
+            $where_clauses[] = $wpdb->prepare('tipo = %s', $args['tipo']);
+        }
+
+        if (isset($args['estado'])) {
+            $where_clauses[] = $wpdb->prepare('estado = %s', $args['estado']);
+        }
+
+        if (!empty($where_clauses)) {
+            $args['where'] = implode(' AND ', $where_clauses);
+        }
+
+        // Regular get_all with filters
+        $persona_model = new CDC_Persona();
         $personas = $persona_model->get_all($args);
 
         return $this->prepare_response(array(
