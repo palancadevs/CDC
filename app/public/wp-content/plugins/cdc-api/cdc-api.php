@@ -75,6 +75,7 @@ final class CDC_API {
         // Models
         require_once CDC_API_PLUGIN_DIR . 'includes/models/class-persona.php';
         require_once CDC_API_PLUGIN_DIR . 'includes/models/class-socio.php';
+        require_once CDC_API_PLUGIN_DIR . 'includes/models/class-cuota-socio.php';
         require_once CDC_API_PLUGIN_DIR . 'includes/models/class-cliente.php';
         require_once CDC_API_PLUGIN_DIR . 'includes/models/class-recibo.php';
         require_once CDC_API_PLUGIN_DIR . 'includes/models/class-movimiento-caja.php';

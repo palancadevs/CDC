@@ -67,6 +67,32 @@ class CDC_Database_Schema {
         ) $charset_collate;";
         dbDelta($sql_socios);
 
+        // 2b. Cuotas Socio - Monthly membership fees (12 months grid)
+        $table_cuotas_socio = $wpdb->prefix . 'cdc_cuota_socio';
+        $sql_cuotas_socio = "CREATE TABLE $table_cuotas_socio (
+            id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+            persona_id bigint(20) unsigned NOT NULL,
+            anio int(4) NOT NULL,
+            mes tinyint(2) NOT NULL,
+            monto decimal(10,2) NOT NULL DEFAULT 0.00,
+            pagada tinyint(1) NOT NULL DEFAULT 0,
+            fecha_pago datetime DEFAULT NULL,
+            medio_pago enum('efectivo','transferencia','tarjeta','mercadopago') DEFAULT NULL,
+            comprobante_id varchar(100) DEFAULT NULL,
+            recibo_id bigint(20) unsigned DEFAULT NULL,
+            observaciones text DEFAULT NULL,
+            created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            UNIQUE KEY persona_anio_mes (persona_id, anio, mes),
+            KEY persona_id (persona_id),
+            KEY anio (anio),
+            KEY mes (mes),
+            KEY pagada (pagada),
+            KEY recibo_id (recibo_id)
+        ) $charset_collate;";
+        dbDelta($sql_cuotas_socio);
+
         // 3. Clientes - Clients (extends personas)
         $table_clientes = $wpdb->prefix . 'cdc_clientes';
         $sql_clientes = "CREATE TABLE $table_clientes (
@@ -326,6 +352,7 @@ class CDC_Database_Schema {
             $wpdb->prefix . 'cdc_movimientos_caja',
             $wpdb->prefix . 'cdc_items_recibo',
             $wpdb->prefix . 'cdc_recibos',
+            $wpdb->prefix . 'cdc_cuota_socio',
             $wpdb->prefix . 'cdc_clientes',
             $wpdb->prefix . 'cdc_socios',
             $wpdb->prefix . 'cdc_personas',

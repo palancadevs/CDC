@@ -105,6 +105,21 @@ get_header();
                               placeholder="Notas adicionales (opcional)"></textarea>
                 </div>
 
+                <h4 class="cdc-form-section-title" style="margin-top: 30px;">Cuotas</h4>
+
+                <div class="cdc-form-group">
+                    <label class="cdc-checkbox-label">
+                        <input type="checkbox"
+                               id="cdc-generar-cuotas"
+                               class="cdc-checkbox"
+                               checked>
+                        <span>Generar planilla de cuotas del año actual (12 meses)</span>
+                    </label>
+                    <small class="cdc-text-muted">
+                        Se crearán 12 registros de cuotas mensuales desde el mes actual hasta diciembre.
+                    </small>
+                </div>
+
                 <div class="cdc-form-actions">
                     <button type="submit" class="cdc-button cdc-button-primary">
                         Crear socio
@@ -146,12 +161,11 @@ jQuery(document).ready(function($) {
             nombre: $('#cdc-nombre').val(),
             apellido: $('#cdc-apellido').val(),
             dni: dni,
-            tel: $('#cdc-tel').val(),
+            telefono: $('#cdc-tel').val(),
             email: $('#cdc-email').val(),
-            domicilio: $('#cdc-domicilio').val(),
-            categoria: $('#cdc-categoria').val(),
-            subcategoria: $('#cdc-subcategoria').val(),
-            observaciones: $('#cdc-observaciones').val()
+            direccion: $('#cdc-domicilio').val(),
+            notas: $('#cdc-observaciones').val(),
+            generar_cuotas: $('#cdc-generar-cuotas').is(':checked')
         };
 
         console.log('📤 Enviando datos:', data);
