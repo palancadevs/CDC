@@ -79,14 +79,15 @@ jQuery(document).ready(function($) {
         let html = '<div class="cdc-table-wrapper"><table class="cdc-table"><thead><tr><th>Taller</th><th>Sala</th><th>Tallerista</th><th>Días y horarios</th><th>Precio</th><th>Estado</th><th>Acción</th></tr></thead><tbody>';
 
         talleres.forEach(t => {
+            const horario_completo = (t.dia_semana || '') + ' ' + (t.horario || '');
             html += `<tr>
                 <td><strong>${t.nombre}</strong></td>
-                <td>${t.sala_nombre || '-'}</td>
-                <td>${t.tallerista_nombre || '-'}</td>
-                <td>${t.horarios || '-'}</td>
-                <td>$${CDC.formatCurrency(t.precio)}</td>
+                <td>${t.sala_id || '-'}</td>
+                <td>${t.profesor || '-'}</td>
+                <td>${horario_completo.trim() || '-'}</td>
+                <td>$${parseFloat(t.precio_mensual || 0).toFixed(2)}</td>
                 <td><span class="cdc-badge">${t.estado}</span></td>
-                <td><a href="${cdcData.homeUrl}/taller/${t.id}" class="cdc-button cdc-button-small">Ver</a></td>
+                <td><a href="${cdcData.homeUrl}/taller?id=${t.id}" class="cdc-button cdc-button-small">Ver</a></td>
             </tr>`;
         });
 
@@ -134,7 +135,7 @@ jQuery(document).ready(function($) {
 
     // Nuevo taller button
     $('#cdc-nuevo-taller').on('click', function() {
-        alert('Formulario de nuevo taller próximamente');
+        window.location.href = cdcData.homeUrl + '/nuevo-taller';
     });
 
     // Initial load

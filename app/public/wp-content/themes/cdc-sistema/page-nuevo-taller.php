@@ -40,11 +40,11 @@ get_header();
 
                 <div class="cdc-form-row">
                     <div class="cdc-form-group cdc-form-col-6">
-                        <label for="cdc-tallerista">Tallerista / Profesor *</label>
+                        <label for="cdc-profesor">Profesor / Tallerista *</label>
                         <input type="text"
-                               id="cdc-tallerista"
+                               id="cdc-profesor"
                                class="cdc-form-control"
-                               placeholder="Nombre del tallerista"
+                               placeholder="Nombre del profesor"
                                required>
                     </div>
                     <div class="cdc-form-group cdc-form-col-6">
@@ -61,24 +61,19 @@ get_header();
                 <h4 class="cdc-form-section-title" style="margin-top: 30px;">Horarios y precio</h4>
 
                 <div class="cdc-form-row">
-                    <div class="cdc-form-group cdc-form-col-4">
-                        <label for="cdc-dias">Días</label>
+                    <div class="cdc-form-group cdc-form-col-6">
+                        <label for="cdc-dia-semana">Día(s) de la semana</label>
                         <input type="text"
-                               id="cdc-dias"
+                               id="cdc-dia-semana"
                                class="cdc-form-control"
                                placeholder="Ej: Lunes y Miércoles">
                     </div>
-                    <div class="cdc-form-group cdc-form-col-4">
-                        <label for="cdc-horario-inicio">Horario inicio</label>
-                        <input type="time"
-                               id="cdc-horario-inicio"
-                               class="cdc-form-control">
-                    </div>
-                    <div class="cdc-form-group cdc-form-col-4">
-                        <label for="cdc-horario-fin">Horario fin</label>
-                        <input type="time"
-                               id="cdc-horario-fin"
-                               class="cdc-form-control">
+                    <div class="cdc-form-group cdc-form-col-6">
+                        <label for="cdc-horario">Horario</label>
+                        <input type="text"
+                               id="cdc-horario"
+                               class="cdc-form-control"
+                               placeholder="Ej: 18:00 a 20:00">
                     </div>
                 </div>
 
@@ -109,8 +104,8 @@ get_header();
                 </div>
 
                 <div class="cdc-form-group">
-                    <label for="cdc-observaciones">Observaciones</label>
-                    <textarea id="cdc-observaciones"
+                    <label for="cdc-notas">Notas</label>
+                    <textarea id="cdc-notas"
                               class="cdc-form-control"
                               rows="2"
                               placeholder="Notas adicionales (opcional)"></textarea>
@@ -143,23 +138,18 @@ jQuery(document).ready(function($) {
         const $submitBtn = $(this).find('button[type="submit"]');
         CDC.showLoadingButton($submitBtn, true);
 
-        const horarios = $('#cdc-dias').val() + ' ' +
-                        $('#cdc-horario-inicio').val() + '-' +
-                        $('#cdc-horario-fin').val();
-
         const data = {
             nombre: $('#cdc-nombre').val(),
             descripcion: $('#cdc-descripcion').val(),
-            tallerista_nombre: $('#cdc-tallerista').val(),
+            profesor: $('#cdc-profesor').val(),
+            dia_semana: $('#cdc-dia-semana').val(),
+            horario: $('#cdc-horario').val(),
             sala_id: $('#cdc-sala').val() || null,
-            dias: $('#cdc-dias').val(),
-            horario_inicio: $('#cdc-horario-inicio').val(),
-            horario_fin: $('#cdc-horario-fin').val(),
-            horarios: horarios,
-            precio: precio,
+            precio_mensual: precio,
             cupo_maximo: $('#cdc-cupo').val() || null,
+            inscriptos: 0,
             estado: $('#cdc-estado').val(),
-            observaciones: $('#cdc-observaciones').val()
+            notas: $('#cdc-notas').val()
         };
 
         CDCAPI.talleres.create(data)
