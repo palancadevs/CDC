@@ -103,6 +103,15 @@ get_header();
                     <small class="cdc-text-muted">Ingrese el monto a cobrar</small>
                 </div>
 
+                <div class="cdc-form-group" id="cdc-descripcion-group" style="display: none;">
+                    <label for="cdc-descripcion">Descripción/Concepto *</label>
+                    <input type="text"
+                           id="cdc-descripcion"
+                           class="cdc-form-control"
+                           placeholder="Ej: Donación, Venta de merchandising, etc.">
+                    <small class="cdc-text-muted">Describa brevemente el concepto del ingreso</small>
+                </div>
+
                 <div class="cdc-form-group">
                     <label>Medio de pago *</label>
                     <div class="cdc-radio-group">
@@ -153,13 +162,25 @@ jQuery(document).ready(function($) {
         $(this).addClass('active');
         selectedType = $(this).data('type');
 
-        // Show step 2
-        $('#cdc-step-2').slideDown();
-
-        // Scroll to step 2
-        $('html, body').animate({
-            scrollTop: $('#cdc-step-2').offset().top - 100
-        }, 500);
+        // For "otro-ingreso", skip person selection
+        if (selectedType === 'otro-ingreso') {
+            $('#cdc-step-2').hide();
+            $('#cdc-cuotas-grid').hide();
+            $('#cdc-monto-group').show();
+            $('#cdc-descripcion-group').show();
+            $('#cdc-step-3').slideDown();
+            $('html, body').animate({
+                scrollTop: $('#cdc-step-3').offset().top - 100
+            }, 500);
+        } else {
+            // Show step 2 for other types
+            $('#cdc-step-2').slideDown();
+            $('#cdc-step-3').hide();
+            // Scroll to step 2
+            $('html, body').animate({
+                scrollTop: $('#cdc-step-2').offset().top - 100
+            }, 500);
+        }
     });
 
     // Step 2: Search person
@@ -364,7 +385,8 @@ jQuery(document).ready(function($) {
         const medio_pago = $('input[name="medio_pago"]:checked').val();
         const observaciones = $('#cdc-observaciones').val();
 
-        if (!selectedPerson) {
+        // For "otro-ingreso", person is optional
+        if (!selectedPerson && selectedType !== 'otro-ingreso') {
             CDC.showNotification('Seleccione una persona', 'warning');
             return;
         }
@@ -415,8 +437,49 @@ jQuery(document).ready(function($) {
                     CDC.showLoadingButton($submitBtn, false);
                     CDC.handleApiError(error, 'Payment Processing');
                 });
+        } else if (selectedType === 'otro-ingreso') {
+            // Handle "otro ingreso" (generic income without persona required)
+            const monto = parseFloat($('#cdc-monto').val());
+            const descripcion = $('#cdc-descripcion').val();
+
+            if (!monto || monto <= 0) {
+                CDC.showNotification('Ingrese un monto válido', 'warning');
+                CDC.showLoadingButton($submitBtn, false);
+                return;
+            }
+
+            if (!descripcion || descripcion.trim() === '') {
+                CDC.showNotification('Ingrese una descripción', 'warning');
+                CDC.showLoadingButton($submitBtn, false);
+                return;
+            }
+
+            const data = {
+                monto: monto,
+                descripcion: descripcion,
+                medio_pago: medio_pago,
+                persona_id: selectedPerson ? selectedPerson.id : null,
+                observaciones: observaciones
+            };
+
+            CDCAPI.cobros.cobrarOtroIngreso(data)
+                .then(function(response) {
+                    CDC.showLoadingButton($submitBtn, false);
+                    if (response.success) {
+                        CDC.showNotification('Ingreso registrado exitosamente', 'success');
+                        setTimeout(function() {
+                            window.location.href = cdcData.homeUrl;
+                        }, 1500);
+                    } else {
+                        CDC.handleApiError(response, 'Payment Processing');
+                    }
+                })
+                .catch(function(error) {
+                    CDC.showLoadingButton($submitBtn, false);
+                    CDC.handleApiError(error, 'Payment Processing');
+                });
         } else {
-            // Handle other payment types (generic)
+            // Handle other payment types (generic - entrada-evento, alquiler-sala)
             const monto = parseFloat($('#cdc-monto').val());
 
             if (!monto || monto <= 0) {
