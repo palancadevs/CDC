@@ -296,6 +296,15 @@
              */
             cobrarCuotaTaller: function(data) {
                 return CDCAPI.request('cobros/cuota-taller', 'POST', data);
+            },
+
+            /**
+             * Cobrar otro ingreso (generic income)
+             * @param {object} data Payment data (monto, descripcion, medio_pago, persona_id, observaciones)
+             * @return {Promise}
+             */
+            cobrarOtroIngreso: function(data) {
+                return CDCAPI.request('cobros/otro-ingreso', 'POST', data);
             }
         },
 

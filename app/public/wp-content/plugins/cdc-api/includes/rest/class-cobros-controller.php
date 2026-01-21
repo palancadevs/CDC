@@ -81,6 +81,15 @@ class CDC_Cobros_Controller extends CDC_Base_Controller {
                 'permission_callback' => array($this, 'check_auth'),
             ),
         ));
+
+        // POST /cobros/otro-ingreso - Register otro ingreso (generic income)
+        register_rest_route($this->namespace, '/' . $this->rest_base . '/otro-ingreso', array(
+            array(
+                'methods' => WP_REST_Server::CREATABLE,
+                'callback' => array($this, 'cobrar_otro_ingreso'),
+                'permission_callback' => array($this, 'check_auth'),
+            ),
+        ));
     }
 
     /**
@@ -353,6 +362,85 @@ class CDC_Cobros_Controller extends CDC_Base_Controller {
                     'movimiento_id' => $movimiento_id,
                     'monto_total' => $monto_total,
                     'cuotas_pagadas' => $cuotas_pagadas,
+                    'saldo_nuevo' => $saldo_nuevo,
+                ),
+            ), 201);
+
+        } catch (Exception $e) {
+            // Rollback on error
+            $wpdb->query('ROLLBACK');
+
+            return $this->prepare_error($e->getMessage(), 400);
+        }
+    }
+
+    /**
+     * Cobrar otro ingreso (generic income)
+     *
+     * @param WP_REST_Request $request Request object
+     * @return WP_REST_Response|WP_Error
+     */
+    public function cobrar_otro_ingreso($request) {
+        global $wpdb;
+
+        $data = $request->get_json_params();
+
+        // Validate required fields
+        if (empty($data['monto']) || empty($data['descripcion']) || empty($data['medio_pago'])) {
+            return $this->prepare_error('monto, descripcion y medio_pago son requeridos', 400);
+        }
+
+        $monto = floatval($data['monto']);
+        $descripcion = sanitize_text_field($data['descripcion']);
+        $medio_pago = sanitize_text_field($data['medio_pago']);
+        $persona_id = isset($data['persona_id']) ? intval($data['persona_id']) : null;
+        $observaciones = isset($data['observaciones']) ? sanitize_textarea_field($data['observaciones']) : '';
+
+        // Validate monto
+        if ($monto <= 0) {
+            return $this->prepare_error('El monto debe ser mayor a 0', 400);
+        }
+
+        // Validate medio_pago
+        if (!in_array($medio_pago, array('efectivo', 'transferencia', 'tarjeta', 'mercadopago'))) {
+            return $this->prepare_error('medio_pago inválido', 400);
+        }
+
+        // Get current balance
+        $saldo_actual = $this->movimiento_caja_model->get_current_balance();
+        $saldo_nuevo = $saldo_actual + $monto;
+
+        // Start transaction
+        $wpdb->query('START TRANSACTION');
+
+        try {
+            // Create movimiento_caja
+            $movimiento_data = array(
+                'tipo' => 'ingreso',
+                'concepto' => $descripcion,
+                'monto' => $monto,
+                'saldo_anterior' => $saldo_actual,
+                'saldo_nuevo' => $saldo_nuevo,
+                'usuario_id' => get_current_user_id(),
+                'fecha_movimiento' => current_time('mysql'),
+                'notas' => $observaciones,
+            );
+
+            $movimiento_id = $this->movimiento_caja_model->create($movimiento_data);
+
+            if (!$movimiento_id) {
+                throw new Exception('Error al crear movimiento de caja');
+            }
+
+            // Commit transaction
+            $wpdb->query('COMMIT');
+
+            return $this->prepare_response(array(
+                'success' => true,
+                'message' => 'Ingreso registrado correctamente',
+                'data' => array(
+                    'movimiento_id' => $movimiento_id,
+                    'monto' => $monto,
                     'saldo_nuevo' => $saldo_nuevo,
                 ),
             ), 201);
