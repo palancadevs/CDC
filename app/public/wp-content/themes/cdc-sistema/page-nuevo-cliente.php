@@ -114,10 +114,10 @@ jQuery(document).ready(function($) {
             nombre: $('#cdc-nombre').val(),
             apellido: $('#cdc-apellido').val(),
             dni: dni,
-            tel: $('#cdc-tel').val(),
+            telefono: $('#cdc-tel').val(),
             email: $('#cdc-email').val(),
-            domicilio: $('#cdc-domicilio').val(),
-            observaciones: $('#cdc-observaciones').val()
+            direccion: $('#cdc-domicilio').val(),
+            notas: $('#cdc-observaciones').val()
         };
 
         CDCAPI.personas.create(data)
