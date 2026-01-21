@@ -218,17 +218,45 @@ class CDC_Caja_Service {
     }
 
     /**
-     * Get movements by date range
+     * Get movements by date range with optional type filter
      *
      * @param string $fecha_inicio Start date
      * @param string $fecha_fin End date
+     * @param string $tipo Optional type filter (ingreso/egreso)
      * @return array
      */
-    public function get_movements_by_date_range($fecha_inicio, $fecha_fin) {
-        return $this->movimiento_model->get_by_date_range($fecha_inicio, $fecha_fin, array(
-            'orderby' => 'fecha_movimiento',
-            'order' => 'DESC',
-        ));
+    public function get_movements_by_date_range($fecha_inicio, $fecha_fin, $tipo = null) {
+        global $wpdb;
+
+        $fecha_inicio_full = $fecha_inicio . ' 00:00:00';
+        $fecha_fin_full = $fecha_fin . ' 23:59:59';
+
+        $query = "SELECT * FROM {$wpdb->prefix}cdc_movimientos_caja
+                  WHERE fecha_movimiento >= %s AND fecha_movimiento <= %s";
+        $params = array($fecha_inicio_full, $fecha_fin_full);
+
+        if ($tipo && in_array($tipo, array('ingreso', 'egreso', 'apertura', 'cierre'))) {
+            $query .= " AND tipo = %s";
+            $params[] = $tipo;
+        }
+
+        $query .= " ORDER BY fecha_movimiento DESC";
+
+        return $wpdb->get_results($wpdb->prepare($query, $params));
+    }
+
+    /**
+     * Get summary by date range
+     *
+     * @param string $fecha_inicio Start date
+     * @param string $fecha_fin End date
+     * @return array Summary data
+     */
+    public function get_summary_by_date_range($fecha_inicio, $fecha_fin) {
+        $fecha_inicio_full = $fecha_inicio . ' 00:00:00';
+        $fecha_fin_full = $fecha_fin . ' 23:59:59';
+
+        return $this->get_cash_summary($fecha_inicio_full, $fecha_fin_full);
     }
 
     /**

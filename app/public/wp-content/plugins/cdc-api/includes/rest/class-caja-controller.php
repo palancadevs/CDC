@@ -43,11 +43,29 @@ class CDC_Caja_Controller extends CDC_Base_Controller {
             ),
         ));
 
+        // GET /caja/movimientos - Get movements with filters
+        register_rest_route($this->namespace, '/' . $this->rest_base . '/movimientos', array(
+            array(
+                'methods' => WP_REST_Server::READABLE,
+                'callback' => array($this, 'get_movements'),
+                'permission_callback' => array($this, 'check_auth'),
+            ),
+        ));
+
         // GET /caja/movimientos/today - Get today's movements
         register_rest_route($this->namespace, '/' . $this->rest_base . '/movimientos/today', array(
             array(
                 'methods' => WP_REST_Server::READABLE,
                 'callback' => array($this, 'get_today_movements'),
+                'permission_callback' => array($this, 'check_auth'),
+            ),
+        ));
+
+        // GET /caja/summary - Get summary with date filters
+        register_rest_route($this->namespace, '/' . $this->rest_base . '/summary', array(
+            array(
+                'methods' => WP_REST_Server::READABLE,
+                'callback' => array($this, 'get_summary'),
                 'permission_callback' => array($this, 'check_auth'),
             ),
         ));
@@ -86,6 +104,59 @@ class CDC_Caja_Controller extends CDC_Base_Controller {
                 'callback' => array($this, 'create_gasto'),
                 'permission_callback' => array($this, 'check_auth'),
             ),
+        ));
+    }
+
+    /**
+     * Get movements with filters
+     *
+     * @param WP_REST_Request $request Request object
+     * @return WP_REST_Response
+     */
+    public function get_movements($request) {
+        $fecha_desde = $request->get_param('fecha_desde');
+        $fecha_hasta = $request->get_param('fecha_hasta');
+        $tipo = $request->get_param('tipo');
+
+        // Default to current month if no dates provided
+        if (!$fecha_desde) {
+            $fecha_desde = date('Y-m-01');
+        }
+        if (!$fecha_hasta) {
+            $fecha_hasta = date('Y-m-d');
+        }
+
+        $movements = $this->service->get_movements_by_date_range($fecha_desde, $fecha_hasta, $tipo);
+
+        return $this->prepare_response(array(
+            'success' => true,
+            'data' => $movements,
+        ));
+    }
+
+    /**
+     * Get summary with date filters
+     *
+     * @param WP_REST_Request $request Request object
+     * @return WP_REST_Response
+     */
+    public function get_summary($request) {
+        $fecha_desde = $request->get_param('fecha_desde');
+        $fecha_hasta = $request->get_param('fecha_hasta');
+
+        // Default to current month if no dates provided
+        if (!$fecha_desde) {
+            $fecha_desde = date('Y-m-01');
+        }
+        if (!$fecha_hasta) {
+            $fecha_hasta = date('Y-m-d');
+        }
+
+        $summary = $this->service->get_summary_by_date_range($fecha_desde, $fecha_hasta);
+
+        return $this->prepare_response(array(
+            'success' => true,
+            'data' => $summary,
         ));
     }
 
