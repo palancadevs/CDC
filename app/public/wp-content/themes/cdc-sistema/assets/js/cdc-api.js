@@ -339,6 +339,27 @@
              */
             update: function(id, data) {
                 return CDCAPI.request('talleres/' + id, 'PUT', data);
+            },
+
+            /**
+             * Inscribe person to taller
+             * @param {number} taller_id Taller ID
+             * @param {object} data Inscription data (persona_id, monto_mensual, notas)
+             * @return {Promise}
+             */
+            inscribir: function(taller_id, data) {
+                return CDCAPI.request('talleres/' + taller_id + '/inscribir', 'POST', data);
+            },
+
+            /**
+             * Get inscripciones for taller
+             * @param {number} taller_id Taller ID
+             * @param {string} estado Estado filter (optional)
+             * @return {Promise}
+             */
+            inscripciones: function(taller_id, estado) {
+                const params = estado ? { estado: estado } : {};
+                return CDCAPI.request('talleres/' + taller_id + '/inscripciones', 'GET', params);
             }
         },
 

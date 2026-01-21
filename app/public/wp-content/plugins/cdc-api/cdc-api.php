@@ -92,6 +92,7 @@ final class CDC_API {
         require_once CDC_API_PLUGIN_DIR . 'includes/services/class-recibo-service.php';
         require_once CDC_API_PLUGIN_DIR . 'includes/services/class-caja-service.php';
         require_once CDC_API_PLUGIN_DIR . 'includes/services/class-taller-service.php';
+        require_once CDC_API_PLUGIN_DIR . 'includes/services/class-inscripcion-service.php';
         require_once CDC_API_PLUGIN_DIR . 'includes/services/class-evento-service.php';
         require_once CDC_API_PLUGIN_DIR . 'includes/services/class-sala-service.php';
 
