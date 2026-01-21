@@ -100,6 +100,7 @@ final class CDC_API {
         require_once CDC_API_PLUGIN_DIR . 'includes/rest/class-personas-controller.php';
         require_once CDC_API_PLUGIN_DIR . 'includes/rest/class-recibos-controller.php';
         require_once CDC_API_PLUGIN_DIR . 'includes/rest/class-caja-controller.php';
+        require_once CDC_API_PLUGIN_DIR . 'includes/rest/class-cobros-controller.php';
         require_once CDC_API_PLUGIN_DIR . 'includes/rest/class-talleres-controller.php';
         require_once CDC_API_PLUGIN_DIR . 'includes/rest/class-eventos-controller.php';
         require_once CDC_API_PLUGIN_DIR . 'includes/rest/class-salas-controller.php';
@@ -121,6 +122,7 @@ final class CDC_API {
             new CDC_Personas_Controller(),
             new CDC_Recibos_Controller(),
             new CDC_Caja_Controller(),
+            new CDC_Cobros_Controller(),
             new CDC_Talleres_Controller(),
             new CDC_Eventos_Controller(),
             new CDC_Salas_Controller(),

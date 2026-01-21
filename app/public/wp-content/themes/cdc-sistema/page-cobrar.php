@@ -82,8 +82,17 @@ get_header();
             <h3 class="cdc-card-title">Paso 3) Datos del cobro</h3>
         </div>
         <div class="cdc-card-body">
+            <!-- Cuotas grid for cuota-socio -->
+            <div id="cdc-cuotas-grid" style="display: none; margin-bottom: 20px;">
+                <h4>Seleccione las cuotas a cobrar:</h4>
+                <div id="cdc-cuotas-list"></div>
+                <div style="margin-top: 15px; padding: 15px; background: #f0f6fc; border-radius: 4px;">
+                    <strong>Total a cobrar: $<span id="cdc-total-cuotas">0.00</span></strong>
+                </div>
+            </div>
+
             <form id="cdc-payment-form">
-                <div class="cdc-form-group">
+                <div class="cdc-form-group" id="cdc-monto-group">
                     <label for="cdc-monto">Monto *</label>
                     <input type="number"
                            id="cdc-monto"
@@ -194,13 +203,85 @@ jQuery(document).ready(function($) {
         $('#cdc-selected-person').show();
         $('#cdc-person-results').hide();
 
-        // Show step 3
-        $('#cdc-step-3').slideDown();
+        // If cuota-socio, load pending cuotas
+        if (selectedType === 'cuota-socio') {
+            loadPendingCuotas(person.id);
+        } else {
+            // Show normal form
+            $('#cdc-cuotas-grid').hide();
+            $('#cdc-monto-group').show();
+            $('#cdc-step-3').slideDown();
+            $('html, body').animate({
+                scrollTop: $('#cdc-step-3').offset().top - 100
+            }, 500);
+        }
+    }
 
-        // Scroll to step 3
-        $('html, body').animate({
-            scrollTop: $('#cdc-step-3').offset().top - 100
-        }, 500);
+    // Load pending cuotas for socio
+    function loadPendingCuotas(persona_id) {
+        const $cuotasList = $('#cdc-cuotas-list');
+        $cuotasList.html('<p class="cdc-text-muted">Cargando cuotas...</p>');
+
+        CDCAPI.cobros.cuotasPendientes(persona_id)
+            .then(function(response) {
+                if (response.success) {
+                    if (response.data && response.data.length > 0) {
+                        renderCuotasGrid(response.data);
+                        $('#cdc-cuotas-grid').show();
+                        $('#cdc-monto-group').hide();
+                        $('#cdc-step-3').slideDown();
+                        $('html, body').animate({
+                            scrollTop: $('#cdc-step-3').offset().top - 100
+                        }, 500);
+                    } else {
+                        $cuotasList.html('<p class="cdc-text-muted">No hay cuotas pendientes.</p>');
+                        CDC.showNotification('Este socio no tiene cuotas pendientes', 'info');
+                    }
+                } else {
+                    CDC.handleApiError(response, 'Load Cuotas');
+                }
+            })
+            .catch(function(error) {
+                CDC.handleApiError(error, 'Load Cuotas');
+            });
+    }
+
+    // Render cuotas grid with checkboxes
+    function renderCuotasGrid(cuotas) {
+        const meses = ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                      'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
+        let html = '<table class="cdc-table"><thead><tr>';
+        html += '<th style="width: 50px;"><input type="checkbox" id="cdc-select-all-cuotas"></th>';
+        html += '<th>Año</th><th>Mes</th><th>Monto</th>';
+        html += '</tr></thead><tbody>';
+
+        cuotas.forEach(function(cuota) {
+            html += `<tr>
+                <td><input type="checkbox" class="cdc-cuota-checkbox" data-cuota-id="${cuota.id}" data-monto="${cuota.monto}"></td>
+                <td>${cuota.anio}</td>
+                <td>${meses[parseInt(cuota.mes)]}</td>
+                <td>$${parseFloat(cuota.monto).toFixed(2)}</td>
+            </tr>`;
+        });
+
+        html += '</tbody></table>';
+        $('#cdc-cuotas-list').html(html);
+
+        // Bind checkbox events
+        $('.cdc-cuota-checkbox').on('change', calculateTotalCuotas);
+        $('#cdc-select-all-cuotas').on('change', function() {
+            $('.cdc-cuota-checkbox').prop('checked', $(this).is(':checked')).trigger('change');
+        });
+    }
+
+    // Calculate total from selected cuotas
+    function calculateTotalCuotas() {
+        let total = 0;
+        $('.cdc-cuota-checkbox:checked').each(function() {
+            total += parseFloat($(this).data('monto'));
+        });
+        $('#cdc-total-cuotas').text(total.toFixed(2));
     }
 
     // Helper function to get concepto by type
@@ -219,14 +300,8 @@ jQuery(document).ready(function($) {
     $('#cdc-payment-form').on('submit', function(e) {
         e.preventDefault();
 
-        const monto = parseFloat($('#cdc-monto').val());
         const medio_pago = $('input[name="medio_pago"]:checked').val();
         const observaciones = $('#cdc-observaciones').val();
-
-        if (!monto || monto <= 0) {
-            CDC.showNotification('Ingrese un monto válido', 'warning');
-            return;
-        }
 
         if (!selectedPerson) {
             CDC.showNotification('Seleccione una persona', 'warning');
@@ -236,36 +311,84 @@ jQuery(document).ready(function($) {
         const $submitBtn = $(this).find('button[type="submit"]');
         CDC.showLoadingButton($submitBtn, true);
 
-        const data = {
-            persona_id: selectedPerson.id,
-            tipo: selectedType,
-            items: [{
-                descripcion: getConceptoByType(selectedType),
-                cantidad: 1,
-                precio_unitario: monto,
-                subtotal: monto
-            }],
-            concepto: getConceptoByType(selectedType),
-            metodo_pago: medio_pago,
-            notas: observaciones
-        };
-
-        CDCAPI.recibos.create(data)
-            .then(function(response) {
-                CDC.showLoadingButton($submitBtn, false);
-                if (response.success) {
-                    CDC.showNotification('Cobro registrado exitosamente', 'success');
-                    setTimeout(function() {
-                        window.location.href = cdcData.homeUrl;
-                    }, 1500);
-                } else {
-                    CDC.handleApiError(response, 'Payment Processing');
-                }
-            })
-            .catch(function(error) {
-                CDC.showLoadingButton($submitBtn, false);
-                CDC.handleApiError(error, 'Payment Processing');
+        // Handle cuota-socio differently
+        if (selectedType === 'cuota-socio') {
+            // Get selected cuotas
+            const selectedCuotas = [];
+            $('.cdc-cuota-checkbox:checked').each(function() {
+                selectedCuotas.push(parseInt($(this).data('cuota-id')));
             });
+
+            if (selectedCuotas.length === 0) {
+                CDC.showNotification('Seleccione al menos una cuota', 'warning');
+                CDC.showLoadingButton($submitBtn, false);
+                return;
+            }
+
+            const data = {
+                persona_id: selectedPerson.id,
+                cuota_ids: selectedCuotas,
+                medio_pago: medio_pago,
+                observaciones: observaciones
+            };
+
+            CDCAPI.cobros.cobrarCuotaSocio(data)
+                .then(function(response) {
+                    CDC.showLoadingButton($submitBtn, false);
+                    if (response.success) {
+                        CDC.showNotification('Cuota(s) cobrada(s) exitosamente', 'success');
+                        setTimeout(function() {
+                            window.location.href = cdcData.homeUrl;
+                        }, 1500);
+                    } else {
+                        CDC.handleApiError(response, 'Payment Processing');
+                    }
+                })
+                .catch(function(error) {
+                    CDC.showLoadingButton($submitBtn, false);
+                    CDC.handleApiError(error, 'Payment Processing');
+                });
+        } else {
+            // Handle other payment types (generic)
+            const monto = parseFloat($('#cdc-monto').val());
+
+            if (!monto || monto <= 0) {
+                CDC.showNotification('Ingrese un monto válido', 'warning');
+                CDC.showLoadingButton($submitBtn, false);
+                return;
+            }
+
+            const data = {
+                persona_id: selectedPerson.id,
+                tipo: selectedType,
+                items: [{
+                    descripcion: getConceptoByType(selectedType),
+                    cantidad: 1,
+                    precio_unitario: monto,
+                    subtotal: monto
+                }],
+                concepto: getConceptoByType(selectedType),
+                metodo_pago: medio_pago,
+                notas: observaciones
+            };
+
+            CDCAPI.recibos.create(data)
+                .then(function(response) {
+                    CDC.showLoadingButton($submitBtn, false);
+                    if (response.success) {
+                        CDC.showNotification('Cobro registrado exitosamente', 'success');
+                        setTimeout(function() {
+                            window.location.href = cdcData.homeUrl;
+                        }, 1500);
+                    } else {
+                        CDC.handleApiError(response, 'Payment Processing');
+                    }
+                })
+                .catch(function(error) {
+                    CDC.showLoadingButton($submitBtn, false);
+                    CDC.handleApiError(error, 'Payment Processing');
+                });
+        }
     });
 
     // Cancel button
