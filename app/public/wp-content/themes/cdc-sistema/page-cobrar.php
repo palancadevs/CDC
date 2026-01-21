@@ -203,9 +203,11 @@ jQuery(document).ready(function($) {
         $('#cdc-selected-person').show();
         $('#cdc-person-results').hide();
 
-        // If cuota-socio, load pending cuotas
+        // If cuota-socio or cuota-taller, load pending cuotas
         if (selectedType === 'cuota-socio') {
             loadPendingCuotas(person.id);
+        } else if (selectedType === 'cuota-taller') {
+            loadPendingCuotasTaller(person.id);
         } else {
             // Show normal form
             $('#cdc-cuotas-grid').hide();
@@ -243,6 +245,35 @@ jQuery(document).ready(function($) {
             })
             .catch(function(error) {
                 CDC.handleApiError(error, 'Load Cuotas');
+            });
+    }
+
+    // Load pending cuotas taller
+    function loadPendingCuotasTaller(persona_id) {
+        const $cuotasList = $('#cdc-cuotas-list');
+        $cuotasList.html('<p class="cdc-text-muted">Cargando cuotas de talleres...</p>');
+
+        CDCAPI.cobros.cuotasTallerPendientes(persona_id)
+            .then(function(response) {
+                if (response.success) {
+                    if (response.data && response.data.length > 0) {
+                        renderCuotasTallerGrid(response.data);
+                        $('#cdc-cuotas-grid').show();
+                        $('#cdc-monto-group').hide();
+                        $('#cdc-step-3').slideDown();
+                        $('html, body').animate({
+                            scrollTop: $('#cdc-step-3').offset().top - 100
+                        }, 500);
+                    } else {
+                        $cuotasList.html('<p class="cdc-text-muted">No hay cuotas de talleres pendientes.</p>');
+                        CDC.showNotification('Esta persona no tiene cuotas de talleres pendientes', 'info');
+                    }
+                } else {
+                    CDC.handleApiError(response, 'Load Cuotas Taller');
+                }
+            })
+            .catch(function(error) {
+                CDC.handleApiError(error, 'Load Cuotas Taller');
             });
     }
 
@@ -284,6 +315,36 @@ jQuery(document).ready(function($) {
         $('#cdc-total-cuotas').text(total.toFixed(2));
     }
 
+    // Render cuotas taller grid with checkboxes
+    function renderCuotasTallerGrid(cuotas) {
+        const meses = ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                      'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
+        let html = '<table class="cdc-table"><thead><tr>';
+        html += '<th style="width: 50px;"><input type="checkbox" id="cdc-select-all-cuotas"></th>';
+        html += '<th>Taller</th><th>Año</th><th>Mes</th><th>Monto</th>';
+        html += '</tr></thead><tbody>';
+
+        cuotas.forEach(function(cuota) {
+            html += `<tr>
+                <td><input type="checkbox" class="cdc-cuota-checkbox" data-cuota-id="${cuota.id}" data-monto="${cuota.monto}"></td>
+                <td>${cuota.taller_nombre || 'Taller'}</td>
+                <td>${cuota.anio}</td>
+                <td>${meses[parseInt(cuota.mes)]}</td>
+                <td>$${parseFloat(cuota.monto).toFixed(2)}</td>
+            </tr>`;
+        });
+
+        html += '</tbody></table>';
+        $('#cdc-cuotas-list').html(html);
+
+        // Bind checkbox events
+        $('.cdc-cuota-checkbox').on('change', calculateTotalCuotas);
+        $('#cdc-select-all-cuotas').on('change', function() {
+            $('.cdc-cuota-checkbox').prop('checked', $(this).is(':checked')).trigger('change');
+        });
+    }
+
     // Helper function to get concepto by type
     function getConceptoByType(type) {
         const map = {
@@ -311,8 +372,8 @@ jQuery(document).ready(function($) {
         const $submitBtn = $(this).find('button[type="submit"]');
         CDC.showLoadingButton($submitBtn, true);
 
-        // Handle cuota-socio differently
-        if (selectedType === 'cuota-socio') {
+        // Handle cuota-socio and cuota-taller differently
+        if (selectedType === 'cuota-socio' || selectedType === 'cuota-taller') {
             // Get selected cuotas
             const selectedCuotas = [];
             $('.cdc-cuota-checkbox:checked').each(function() {
@@ -332,11 +393,17 @@ jQuery(document).ready(function($) {
                 observaciones: observaciones
             };
 
-            CDCAPI.cobros.cobrarCuotaSocio(data)
+            // Call appropriate API method
+            const apiMethod = selectedType === 'cuota-socio'
+                ? CDCAPI.cobros.cobrarCuotaSocio(data)
+                : CDCAPI.cobros.cobrarCuotaTaller(data);
+
+            apiMethod
                 .then(function(response) {
                     CDC.showLoadingButton($submitBtn, false);
                     if (response.success) {
-                        CDC.showNotification('Cuota(s) cobrada(s) exitosamente', 'success');
+                        const tipoText = selectedType === 'cuota-socio' ? 'socio' : 'taller';
+                        CDC.showNotification(`Cuota(s) de ${tipoText} cobrada(s) exitosamente`, 'success');
                         setTimeout(function() {
                             window.location.href = cdcData.homeUrl;
                         }, 1500);
