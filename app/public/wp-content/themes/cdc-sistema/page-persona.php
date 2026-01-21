@@ -47,20 +47,28 @@ jQuery(document).ready(function($) {
     function renderPersona(persona) {
         let html = '';
 
-        // Header with back button
+        // Header with back and edit buttons
         html += `<div class="cdc-page-header">
-            <a href="${cdcData.homeUrl}/personas" class="cdc-button cdc-button-secondary">
-                <span class="dashicons dashicons-arrow-left-alt2"></span> Volver
-            </a>
+            <div>
+                <h1 class="cdc-page-title">${persona.nombre} ${persona.apellido}</h1>
+                <span class="cdc-badge ${persona.tipo === 'socio' ? 'cdc-badge-primary' : 'cdc-badge-info'}">
+                    ${persona.tipo === 'socio' ? 'Socio' : 'Cliente'}
+                </span>
+            </div>
+            <div class="cdc-page-header-actions">
+                <a href="${cdcData.homeUrl}/editar-persona?id=${persona.id}" class="cdc-button cdc-button-primary">
+                    <span class="dashicons dashicons-edit"></span> Editar
+                </a>
+                <a href="${cdcData.homeUrl}/personas" class="cdc-button cdc-button-secondary">
+                    <span class="dashicons dashicons-arrow-left-alt2"></span> Volver
+                </a>
+            </div>
         </div>`;
 
         // Personal info card
         html += `<div class="cdc-card">
             <div class="cdc-card-header">
-                <h3 class="cdc-card-title">${persona.nombre} ${persona.apellido}</h3>
-                <span class="cdc-badge ${persona.tipo === 'socio' ? 'cdc-badge-primary' : 'cdc-badge-info'}">
-                    ${persona.tipo === 'socio' ? 'Socio' : 'Cliente'}
-                </span>
+                <h3 class="cdc-card-title">Información Personal</h3>
             </div>
             <div class="cdc-card-body">
                 <div class="cdc-info-grid">
