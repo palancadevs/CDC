@@ -253,21 +253,23 @@
             let html = `<div class="cdc-table-wrapper"><table class="cdc-table">
                 <thead><tr>
                     <th>Nombre</th><th>Tipo</th><th>DNI</th>
-                    <th>Teléfono</th><th>Estado</th><th>Acción</th>
+                    <th>Teléfono</th><th>Email</th><th>Acción</th>
                 </tr></thead><tbody>`;
 
             personas.forEach(p => {
                 const tipo = p.tipo === 'socio' ? 'Socio' : 'Cliente';
-                const estado = p.estado === 'activo' ?
-                    '<span class="cdc-badge cdc-badge-success">Activo</span>' :
-                    '<span class="cdc-badge cdc-badge-secondary">Inactivo</span>';
+                const tipoBadge = p.tipo === 'socio' ?
+                    '<span class="cdc-badge cdc-badge-primary">Socio</span>' :
+                    '<span class="cdc-badge cdc-badge-info">Cliente</span>';
+                const telefono = p.telefono || p.tel || '-';
+                const email = p.email || '-';
 
                 html += `<tr>
                     <td><strong>${p.apellido}, ${p.nombre}</strong></td>
-                    <td>${tipo}</td>
+                    <td>${tipoBadge}</td>
                     <td>${p.dni}</td>
-                    <td>${p.tel || '-'}</td>
-                    <td>${estado}</td>
+                    <td>${telefono}</td>
+                    <td>${email}</td>
                     <td><a href="${cdcData.homeUrl}/persona/${p.id}" class="cdc-button cdc-button-small">Ver ficha</a></td>
                 </tr>`;
             });

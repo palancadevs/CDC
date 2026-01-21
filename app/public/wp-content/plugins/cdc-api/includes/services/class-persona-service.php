@@ -30,12 +30,18 @@ class CDC_Persona_Service {
     private $cliente_model;
 
     /**
+     * Cuota Socio model
+     */
+    private $cuota_socio_model;
+
+    /**
      * Constructor
      */
     public function __construct() {
         $this->persona_model = new CDC_Persona();
         $this->socio_model = new CDC_Socio();
         $this->cliente_model = new CDC_Cliente();
+        $this->cuota_socio_model = new CDC_Cuota_Socio();
     }
 
     /**
@@ -76,6 +82,11 @@ class CDC_Persona_Service {
 
         if (in_array($tipo, array('socio', 'ambos'))) {
             $this->create_socio_record($persona_id, $data);
+
+            // Generate cuotas if requested
+            if (isset($data['generar_cuotas']) && $data['generar_cuotas']) {
+                $this->generate_cuotas_socio($persona_id, $data);
+            }
         }
 
         if (in_array($tipo, array('cliente', 'ambos'))) {
@@ -213,6 +224,30 @@ class CDC_Persona_Service {
         return array(
             'success' => true,
             'message' => 'Convertido a socio correctamente',
+        );
+    }
+
+    /**
+     * Generate cuotas for socio
+     *
+     * @param int $persona_id Persona ID
+     * @param array $data Socio data
+     * @return int Number of cuotas created
+     */
+    private function generate_cuotas_socio($persona_id, $data) {
+        // Get current year and month
+        $current_year = (int) date('Y');
+        $current_month = (int) date('n');
+
+        // Default monto (can be overridden)
+        $monto = isset($data['monto_cuota']) ? $data['monto_cuota'] : 0.00;
+
+        // Generate cuotas from current month to December
+        return $this->cuota_socio_model->generate_cuotas_year(
+            $persona_id,
+            $current_year,
+            $monto,
+            $current_month
         );
     }
 }

@@ -82,15 +82,21 @@ jQuery(document).ready(function($) {
 
     // Load personas function
     function loadPersonas() {
-        const query = $('#cdc-personas-search').val();
+        const query = $('#cdc-personas-search').val().trim();
         const $results = $('#cdc-personas-results');
 
         $results.html('<p class="cdc-text-center cdc-text-muted">Cargando...</p>');
 
         const filters = {};
-        if (currentFilter !== 'todos') {
-            filters.tipo = currentFilter; // 'socios' or 'clientes'
+
+        // Filter by tipo (convert plural to singular: socios -> socio)
+        if (currentFilter === 'socios') {
+            filters.tipo = 'socio';
+        } else if (currentFilter === 'clientes') {
+            filters.tipo = 'cliente';
         }
+
+        // Search query (only if 3+ characters)
         if (query && query.length >= 3) {
             filters.query = query;
         }
@@ -98,7 +104,11 @@ jQuery(document).ready(function($) {
         CDCAPI.personas.list(filters)
             .then(function(response) {
                 if (response.success) {
-                    $results.html(CDC.renderPersonasTable(response.data));
+                    if (response.data && response.data.length > 0) {
+                        $results.html(CDC.renderPersonasTable(response.data));
+                    } else {
+                        $results.html('<p class="cdc-text-center cdc-text-muted">No se encontraron personas.</p>');
+                    }
                 } else {
                     CDC.handleApiError(response, 'Load Personas');
                 }
