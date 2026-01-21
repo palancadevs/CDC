@@ -13,10 +13,20 @@ get_header();
 ?>
 
 <div class="cdc-registrar-gasto">
-    <div class="cdc-card">
-        <div class="cdc-card-header">
-            <h3 class="cdc-card-title">Registrar Gasto</h3>
+    <!-- Header -->
+    <div class="cdc-page-header">
+        <div>
+            <h1 class="cdc-page-title">Registrar Gasto</h1>
+            <p class="cdc-text-muted">Registrar un egreso de caja</p>
         </div>
+        <div class="cdc-page-header-actions">
+            <a href="<?php echo esc_url(home_url('/caja')); ?>" class="cdc-button cdc-button-secondary">
+                <span class="dashicons dashicons-arrow-left-alt"></span> Volver a Caja
+            </a>
+        </div>
+    </div>
+
+    <div class="cdc-card">
         <div class="cdc-card-body">
             <form id="cdc-gasto-form">
                 <div class="cdc-form-row">
@@ -100,9 +110,9 @@ get_header();
 
                 <div class="cdc-form-actions">
                     <button type="submit" class="cdc-button cdc-button-primary">
-                        Guardar gasto
+                        <span class="dashicons dashicons-saved"></span> Guardar gasto
                     </button>
-                    <a href="<?php echo home_url(); ?>" class="cdc-button cdc-button-secondary">
+                    <a href="<?php echo esc_url(home_url('/caja')); ?>" class="cdc-button cdc-button-secondary">
                         Cancelar
                     </a>
                 </div>
@@ -159,15 +169,15 @@ jQuery(document).ready(function($) {
                 if (response.success) {
                     CDC.showNotification('Gasto registrado exitosamente', 'success');
                     setTimeout(function() {
-                        window.location.href = cdcData.homeUrl;
+                        window.location.href = cdcData.homeUrl + '/caja';
                     }, 1500);
                 } else {
-                    CDC.handleApiError(response, 'Expense Registration');
+                    CDC.handleApiError(response, 'Registrar Gasto');
                 }
             })
             .catch(function(error) {
                 CDC.showLoadingButton($submitBtn, false);
-                CDC.handleApiError(error, 'Expense Registration');
+                CDC.handleApiError(error, 'Registrar Gasto');
             });
     });
 });

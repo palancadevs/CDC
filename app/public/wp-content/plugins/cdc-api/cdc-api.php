@@ -81,6 +81,8 @@ final class CDC_API {
         require_once CDC_API_PLUGIN_DIR . 'includes/models/class-movimiento-caja.php';
         require_once CDC_API_PLUGIN_DIR . 'includes/models/class-gasto.php';
         require_once CDC_API_PLUGIN_DIR . 'includes/models/class-taller.php';
+        require_once CDC_API_PLUGIN_DIR . 'includes/models/class-inscripcion-taller.php';
+        require_once CDC_API_PLUGIN_DIR . 'includes/models/class-cuota-taller.php';
         require_once CDC_API_PLUGIN_DIR . 'includes/models/class-evento.php';
         require_once CDC_API_PLUGIN_DIR . 'includes/models/class-sala.php';
         require_once CDC_API_PLUGIN_DIR . 'includes/models/class-reserva-sala.php';
@@ -90,6 +92,7 @@ final class CDC_API {
         require_once CDC_API_PLUGIN_DIR . 'includes/services/class-recibo-service.php';
         require_once CDC_API_PLUGIN_DIR . 'includes/services/class-caja-service.php';
         require_once CDC_API_PLUGIN_DIR . 'includes/services/class-taller-service.php';
+        require_once CDC_API_PLUGIN_DIR . 'includes/services/class-inscripcion-service.php';
         require_once CDC_API_PLUGIN_DIR . 'includes/services/class-evento-service.php';
         require_once CDC_API_PLUGIN_DIR . 'includes/services/class-sala-service.php';
 

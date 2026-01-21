@@ -13,24 +13,46 @@ get_header();
 ?>
 
 <div class="cdc-caja">
+    <!-- Header -->
+    <div class="cdc-page-header">
+        <h1 class="cdc-page-title">Caja</h1>
+        <div class="cdc-page-header-actions">
+            <a href="<?php echo esc_url(home_url('/registrar-gasto')); ?>" class="cdc-button cdc-button-primary">
+                <span class="dashicons dashicons-plus"></span> Registrar gasto
+            </a>
+        </div>
+    </div>
+
     <!-- Summary Card -->
     <div class="cdc-card">
-        <div class="cdc-card-header">
-            <h3 class="cdc-card-title">Resumen de caja</h3>
-        </div>
         <div class="cdc-card-body">
-            <div class="cdc-caja-summary">
-                <div class="cdc-summary-item">
-                    <span class="cdc-summary-label">Total Ingresos</span>
-                    <span class="cdc-summary-value cdc-ingreso">$0.00</span>
+            <div class="cdc-caja-summary-grid">
+                <div class="cdc-summary-card cdc-summary-ingresos">
+                    <div class="cdc-summary-icon">
+                        <span class="dashicons dashicons-arrow-down-alt"></span>
+                    </div>
+                    <div class="cdc-summary-content">
+                        <span class="cdc-summary-label">Total Ingresos</span>
+                        <span class="cdc-summary-value cdc-ingreso">$0.00</span>
+                    </div>
                 </div>
-                <div class="cdc-summary-item">
-                    <span class="cdc-summary-label">Total Egresos</span>
-                    <span class="cdc-summary-value cdc-egreso">$0.00</span>
+                <div class="cdc-summary-card cdc-summary-egresos">
+                    <div class="cdc-summary-icon">
+                        <span class="dashicons dashicons-arrow-up-alt"></span>
+                    </div>
+                    <div class="cdc-summary-content">
+                        <span class="cdc-summary-label">Total Egresos</span>
+                        <span class="cdc-summary-value cdc-egreso">$0.00</span>
+                    </div>
                 </div>
-                <div class="cdc-summary-item">
-                    <span class="cdc-summary-label">Saldo Actual</span>
-                    <span class="cdc-summary-value cdc-saldo">$0.00</span>
+                <div class="cdc-summary-card cdc-summary-balance">
+                    <div class="cdc-summary-icon">
+                        <span class="dashicons dashicons-chart-line"></span>
+                    </div>
+                    <div class="cdc-summary-content">
+                        <span class="cdc-summary-label">Saldo Actual</span>
+                        <span class="cdc-summary-value cdc-saldo">$0.00</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -40,29 +62,41 @@ get_header();
     <div class="cdc-card">
         <div class="cdc-card-body">
             <div class="cdc-filters-bar">
-                <input type="date"
-                       id="cdc-fecha-desde"
-                       class="cdc-form-control"
-                       value="<?php echo date('Y-m-01'); ?>"
-                       style="max-width: 150px;">
+                <div class="cdc-form-group" style="margin-bottom: 0;">
+                    <label for="cdc-fecha-desde" style="font-size: 12px; margin-bottom: 4px;">Desde</label>
+                    <input type="date"
+                           id="cdc-fecha-desde"
+                           class="cdc-form-control"
+                           value="<?php echo date('Y-m-d'); ?>"
+                           style="max-width: 160px;">
+                </div>
 
-                <span style="align-self: center;">hasta</span>
+                <div class="cdc-form-group" style="margin-bottom: 0;">
+                    <label for="cdc-fecha-hasta" style="font-size: 12px; margin-bottom: 4px;">Hasta</label>
+                    <input type="date"
+                           id="cdc-fecha-hasta"
+                           class="cdc-form-control"
+                           value="<?php echo date('Y-m-d'); ?>"
+                           style="max-width: 160px;">
+                </div>
 
-                <input type="date"
-                       id="cdc-fecha-hasta"
-                       class="cdc-form-control"
-                       value="<?php echo date('Y-m-d'); ?>"
-                       style="max-width: 150px;">
+                <div class="cdc-form-group" style="margin-bottom: 0;">
+                    <label for="cdc-filter-tipo" style="font-size: 12px; margin-bottom: 4px;">Tipo</label>
+                    <select id="cdc-filter-tipo" class="cdc-form-control" style="max-width: 150px;">
+                        <option value="">Todos</option>
+                        <option value="ingreso">Ingresos</option>
+                        <option value="egreso">Egresos</option>
+                    </select>
+                </div>
 
-                <select id="cdc-filter-tipo" class="cdc-form-control" style="max-width: 150px;">
-                    <option value="">Todos</option>
-                    <option value="ingreso">Ingresos</option>
-                    <option value="egreso">Egresos</option>
-                </select>
-
-                <button type="button" class="cdc-button cdc-button-primary" id="cdc-filter-btn">
-                    Filtrar
-                </button>
+                <div style="align-self: flex-end;">
+                    <button type="button" class="cdc-button cdc-button-primary" id="cdc-filter-btn">
+                        Filtrar
+                    </button>
+                    <button type="button" class="cdc-button cdc-button-secondary" id="cdc-today-btn">
+                        Hoy
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -71,6 +105,7 @@ get_header();
     <div class="cdc-card">
         <div class="cdc-card-header">
             <h3 class="cdc-card-title">Movimientos</h3>
+            <span id="cdc-movements-count" class="cdc-text-muted"></span>
         </div>
         <div class="cdc-card-body">
             <div id="cdc-movimientos-results">
@@ -118,8 +153,10 @@ jQuery(document).ready(function($) {
             .then(function(response) {
                 if (response.success) {
                     if (response.data && response.data.length > 0) {
+                        $('#cdc-movements-count').text(`${response.data.length} movimiento${response.data.length !== 1 ? 's' : ''}`);
                         renderMovimientos(response.data);
                     } else {
+                        $('#cdc-movements-count').text('0 movimientos');
                         $results.html('<p class="cdc-text-center cdc-text-muted">No hay movimientos registrados para este período.</p>');
                     }
                 } else {
@@ -170,9 +207,102 @@ jQuery(document).ready(function($) {
 
     $('#cdc-filter-btn').on('click', loadMovimientos);
 
+    // Reset to today
+    $('#cdc-today-btn').on('click', function() {
+        const today = '<?php echo date('Y-m-d'); ?>';
+        $('#cdc-fecha-desde').val(today);
+        $('#cdc-fecha-hasta').val(today);
+        $('#cdc-filter-tipo').val('');
+        loadMovimientos();
+    });
+
+    // Auto-reload when dates change
+    $('#cdc-fecha-desde, #cdc-fecha-hasta').on('change', function() {
+        loadMovimientos();
+    });
+
     // Initial load
     loadMovimientos();
 });
 </script>
+
+<style>
+.cdc-caja-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.cdc-summary-card {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    border-radius: 8px;
+    background: #f9f9f9;
+}
+
+.cdc-summary-ingresos {
+    border-left: 4px solid #28a745;
+}
+
+.cdc-summary-egresos {
+    border-left: 4px solid #dc3545;
+}
+
+.cdc-summary-balance {
+    border-left: 4px solid #007bff;
+}
+
+.cdc-summary-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 16px;
+    font-size: 24px;
+}
+
+.cdc-summary-ingresos .cdc-summary-icon {
+    background: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+}
+
+.cdc-summary-egresos .cdc-summary-icon {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+}
+
+.cdc-summary-balance .cdc-summary-icon {
+    background: rgba(0, 123, 255, 0.1);
+    color: #007bff;
+}
+
+.cdc-summary-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.cdc-summary-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.cdc-summary-value {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.cdc-filters-bar {
+    display: flex;
+    gap: 16px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+</style>
 
 <?php get_footer(); ?>

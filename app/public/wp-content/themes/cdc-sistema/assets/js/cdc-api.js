@@ -117,6 +117,17 @@
              */
             update: function(id, data) {
                 return CDCAPI.request('personas/' + id, 'PUT', data);
+            },
+
+            /**
+             * Get cuotas for a persona
+             * @param {number} id Persona ID
+             * @param {number} anio Year (optional, defaults to current year)
+             * @return {Promise}
+             */
+            cuotas: function(id, anio) {
+                const params = anio ? { anio: anio } : {};
+                return CDCAPI.request('personas/' + id + '/cuotas', 'GET', params);
             }
         },
 
@@ -267,6 +278,24 @@
              */
             cobrarCuotaSocio: function(data) {
                 return CDCAPI.request('cobros/cuota-socio', 'POST', data);
+            },
+
+            /**
+             * Get pending cuotas taller for a persona
+             * @param {number} persona_id Persona ID
+             * @return {Promise}
+             */
+            cuotasTallerPendientes: function(persona_id) {
+                return CDCAPI.request('cobros/cuotas-taller-pendientes/' + persona_id);
+            },
+
+            /**
+             * Cobrar cuota taller
+             * @param {object} data Payment data (persona_id, cuota_ids, medio_pago, observaciones)
+             * @return {Promise}
+             */
+            cobrarCuotaTaller: function(data) {
+                return CDCAPI.request('cobros/cuota-taller', 'POST', data);
             }
         },
 
@@ -310,6 +339,27 @@
              */
             update: function(id, data) {
                 return CDCAPI.request('talleres/' + id, 'PUT', data);
+            },
+
+            /**
+             * Inscribe person to taller
+             * @param {number} taller_id Taller ID
+             * @param {object} data Inscription data (persona_id, monto_mensual, notas)
+             * @return {Promise}
+             */
+            inscribir: function(taller_id, data) {
+                return CDCAPI.request('talleres/' + taller_id + '/inscribir', 'POST', data);
+            },
+
+            /**
+             * Get inscripciones for taller
+             * @param {number} taller_id Taller ID
+             * @param {string} estado Estado filter (optional)
+             * @return {Promise}
+             */
+            inscripciones: function(taller_id, estado) {
+                const params = estado ? { estado: estado } : {};
+                return CDCAPI.request('talleres/' + taller_id + '/inscripciones', 'GET', params);
             }
         },
 

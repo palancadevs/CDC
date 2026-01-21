@@ -85,6 +85,15 @@ class CDC_Personas_Controller extends CDC_Base_Controller {
                 ),
             ),
         ));
+
+        // GET /personas/{id}/cuotas - Get cuotas for a persona
+        register_rest_route($this->namespace, '/' . $this->rest_base . '/(?P<id>[\d]+)/cuotas', array(
+            array(
+                'methods' => WP_REST_Server::READABLE,
+                'callback' => array($this, 'get_cuotas'),
+                'permission_callback' => array($this, 'check_auth'),
+            ),
+        ));
     }
 
     /**
@@ -227,6 +236,25 @@ class CDC_Personas_Controller extends CDC_Base_Controller {
         return $this->prepare_response(array(
             'success' => true,
             'data' => $personas,
+        ));
+    }
+
+    /**
+     * Get cuotas for a persona
+     *
+     * @param WP_REST_Request $request Request object
+     * @return WP_REST_Response
+     */
+    public function get_cuotas($request) {
+        $persona_id = $request->get_param('id');
+        $anio = $request->get_param('anio') ?: date('Y');
+
+        $cuota_model = new CDC_Cuota_Socio();
+        $cuotas = $cuota_model->find_by_persona($persona_id, $anio);
+
+        return $this->prepare_response(array(
+            'success' => true,
+            'data' => $cuotas,
         ));
     }
 }

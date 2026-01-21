@@ -270,7 +270,7 @@
                     <td>${p.dni}</td>
                     <td>${telefono}</td>
                     <td>${email}</td>
-                    <td><a href="${cdcData.homeUrl}/persona/${p.id}" class="cdc-button cdc-button-small">Ver ficha</a></td>
+                    <td><a href="${cdcData.homeUrl}/persona?id=${p.id}" class="cdc-button cdc-button-small">Ver ficha</a></td>
                 </tr>`;
             });
 
