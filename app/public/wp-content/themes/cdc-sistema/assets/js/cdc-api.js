@@ -184,11 +184,31 @@
             },
 
             /**
+             * Get movements with filters
+             * @param {object} filters Filter parameters (fecha_desde, fecha_hasta, tipo)
+             * @return {Promise}
+             */
+            movimientos: function(filters) {
+                filters = filters || {};
+                return CDCAPI.request('caja/movimientos', 'GET', filters);
+            },
+
+            /**
              * Get today's movements
              * @return {Promise}
              */
             movements: function() {
                 return CDCAPI.request('caja/movimientos/today');
+            },
+
+            /**
+             * Get summary with filters
+             * @param {object} filters Filter parameters (fecha_desde, fecha_hasta)
+             * @return {Promise}
+             */
+            resumen: function(filters) {
+                filters = filters || {};
+                return CDCAPI.request('caja/summary', 'GET', filters);
             },
 
             /**

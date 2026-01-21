@@ -87,34 +87,90 @@ jQuery(document).ready(function($) {
         const hasta = $('#cdc-fecha-hasta').val();
         const tipo = $('#cdc-filter-tipo').val();
 
-        $('#cdc-movimientos-results').html(`
-            <div class="cdc-table-wrapper">
-                <table class="cdc-table">
-                    <thead>
-                        <tr>
-                            <th>Fecha</th>
-                            <th>Hora</th>
-                            <th>Tipo</th>
-                            <th>Concepto</th>
-                            <th>Monto</th>
-                            <th>Acción</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td colspan="6" class="cdc-text-center cdc-text-muted">
-                                No hay movimientos registrados para este período.<br>
-                                <small>Los movimientos se mostrarán aquí cuando se registren cobros y gastos.</small>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        `);
+        const filters = {
+            fecha_desde: desde,
+            fecha_hasta: hasta
+        };
+
+        if (tipo) {
+            filters.tipo = tipo;
+        }
+
+        // Load summary
+        CDCAPI.caja.resumen(filters)
+            .then(function(response) {
+                if (response.success) {
+                    const data = response.data;
+                    $('.cdc-caja-summary .cdc-ingreso').text(CDC.formatCurrency(data.total_ingresos));
+                    $('.cdc-caja-summary .cdc-egreso').text(CDC.formatCurrency(data.total_egresos));
+                    $('.cdc-caja-summary .cdc-saldo').text(CDC.formatCurrency(data.saldo_actual));
+                }
+            })
+            .catch(function(error) {
+                console.error('Error loading summary:', error);
+            });
+
+        // Load movements
+        const $results = $('#cdc-movimientos-results');
+        $results.html('<p class="cdc-text-center cdc-text-muted">Cargando movimientos...</p>');
+
+        CDCAPI.caja.movimientos(filters)
+            .then(function(response) {
+                if (response.success) {
+                    if (response.data && response.data.length > 0) {
+                        renderMovimientos(response.data);
+                    } else {
+                        $results.html('<p class="cdc-text-center cdc-text-muted">No hay movimientos registrados para este período.</p>');
+                    }
+                } else {
+                    CDC.handleApiError(response, 'Load Movimientos');
+                }
+            })
+            .catch(function(error) {
+                $results.html('<p class="cdc-text-center" style="color: #d63638;">Error al cargar movimientos.</p>');
+                CDC.handleApiError(error, 'Load Movimientos');
+            });
+    }
+
+    function renderMovimientos(movimientos) {
+        let html = '<div class="cdc-table-wrapper"><table class="cdc-table">';
+        html += '<thead><tr>';
+        html += '<th>Fecha/Hora</th><th>Tipo</th><th>Concepto</th><th>Monto</th><th>Saldo</th>';
+        html += '</tr></thead><tbody>';
+
+        movimientos.forEach(function(mov) {
+            const fecha = new Date(mov.fecha_movimiento);
+            const fechaStr = fecha.toLocaleDateString('es-AR');
+            const horaStr = fecha.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+
+            let tipoClass = '';
+            let tipoLabel = '';
+            if (mov.tipo === 'ingreso') {
+                tipoClass = 'cdc-ingreso';
+                tipoLabel = 'Ingreso';
+            } else if (mov.tipo === 'egreso') {
+                tipoClass = 'cdc-egreso';
+                tipoLabel = 'Egreso';
+            } else {
+                tipoLabel = mov.tipo.charAt(0).toUpperCase() + mov.tipo.slice(1);
+            }
+
+            html += `<tr>
+                <td>${fechaStr} ${horaStr}</td>
+                <td><span class="${tipoClass}">${tipoLabel}</span></td>
+                <td>${mov.concepto}</td>
+                <td class="${tipoClass}">${CDC.formatCurrency(mov.monto)}</td>
+                <td>${CDC.formatCurrency(mov.saldo_nuevo)}</td>
+            </tr>`;
+        });
+
+        html += '</tbody></table></div>';
+        $('#cdc-movimientos-results').html(html);
     }
 
     $('#cdc-filter-btn').on('click', loadMovimientos);
 
+    // Initial load
     loadMovimientos();
 });
 </script>
