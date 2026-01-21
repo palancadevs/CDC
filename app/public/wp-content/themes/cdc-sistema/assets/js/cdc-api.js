@@ -278,6 +278,24 @@
              */
             cobrarCuotaSocio: function(data) {
                 return CDCAPI.request('cobros/cuota-socio', 'POST', data);
+            },
+
+            /**
+             * Get pending cuotas taller for a persona
+             * @param {number} persona_id Persona ID
+             * @return {Promise}
+             */
+            cuotasTallerPendientes: function(persona_id) {
+                return CDCAPI.request('cobros/cuotas-taller-pendientes/' + persona_id);
+            },
+
+            /**
+             * Cobrar cuota taller
+             * @param {object} data Payment data (persona_id, cuota_ids, medio_pago, observaciones)
+             * @return {Promise}
+             */
+            cobrarCuotaTaller: function(data) {
+                return CDCAPI.request('cobros/cuota-taller', 'POST', data);
             }
         },
 

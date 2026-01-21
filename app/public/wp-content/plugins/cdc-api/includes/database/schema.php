@@ -226,6 +226,56 @@ class CDC_Database_Schema {
         ) $charset_collate;";
         dbDelta($sql_talleres);
 
+        // 8b. Inscripciones Taller - Workshop enrollments
+        $table_inscripciones_taller = $wpdb->prefix . 'cdc_inscripciones_taller';
+        $sql_inscripciones_taller = "CREATE TABLE $table_inscripciones_taller (
+            id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+            taller_id bigint(20) unsigned NOT NULL,
+            persona_id bigint(20) unsigned NOT NULL,
+            fecha_inscripcion date NOT NULL,
+            fecha_baja date DEFAULT NULL,
+            estado enum('activo','inactivo','finalizado') NOT NULL DEFAULT 'activo',
+            monto_mensual decimal(10,2) NOT NULL DEFAULT 0.00,
+            notas text DEFAULT NULL,
+            created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            KEY taller_id (taller_id),
+            KEY persona_id (persona_id),
+            KEY estado (estado),
+            KEY fecha_inscripcion (fecha_inscripcion)
+        ) $charset_collate;";
+        dbDelta($sql_inscripciones_taller);
+
+        // 8c. Cuotas Taller - Workshop monthly fees
+        $table_cuotas_taller = $wpdb->prefix . 'cdc_cuotas_taller';
+        $sql_cuotas_taller = "CREATE TABLE $table_cuotas_taller (
+            id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+            inscripcion_id bigint(20) unsigned NOT NULL,
+            persona_id bigint(20) unsigned NOT NULL,
+            taller_id bigint(20) unsigned NOT NULL,
+            anio int(4) NOT NULL,
+            mes tinyint(2) NOT NULL,
+            monto decimal(10,2) NOT NULL DEFAULT 0.00,
+            pagada tinyint(1) NOT NULL DEFAULT 0,
+            fecha_pago datetime DEFAULT NULL,
+            medio_pago enum('efectivo','transferencia','tarjeta','mercadopago') DEFAULT NULL,
+            comprobante_id varchar(100) DEFAULT NULL,
+            recibo_id bigint(20) unsigned DEFAULT NULL,
+            observaciones text DEFAULT NULL,
+            created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            KEY inscripcion_id (inscripcion_id),
+            KEY persona_id (persona_id),
+            KEY taller_id (taller_id),
+            KEY anio (anio),
+            KEY mes (mes),
+            KEY pagada (pagada),
+            KEY recibo_id (recibo_id)
+        ) $charset_collate;";
+        dbDelta($sql_cuotas_taller);
+
         // 9. Eventos - Events
         $table_eventos = $wpdb->prefix . 'cdc_eventos';
         $sql_eventos = "CREATE TABLE $table_eventos (
@@ -347,6 +397,8 @@ class CDC_Database_Schema {
             $wpdb->prefix . 'cdc_reservas_salas',
             $wpdb->prefix . 'cdc_salas',
             $wpdb->prefix . 'cdc_eventos',
+            $wpdb->prefix . 'cdc_cuotas_taller',
+            $wpdb->prefix . 'cdc_inscripciones_taller',
             $wpdb->prefix . 'cdc_talleres',
             $wpdb->prefix . 'cdc_gastos',
             $wpdb->prefix . 'cdc_movimientos_caja',
