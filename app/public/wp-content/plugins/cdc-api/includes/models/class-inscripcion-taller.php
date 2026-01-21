@@ -68,7 +68,10 @@ class CDC_Inscripcion_Taller extends CDC_Base_Model {
     public function get_by_taller($taller_id, $estado = null) {
         global $wpdb;
 
-        $query = "SELECT i.*, p.nombre, p.apellido, p.dni
+        $query = "SELECT i.*,
+                  p.nombre as persona_nombre,
+                  p.apellido as persona_apellido,
+                  p.dni as persona_dni
                   FROM {$this->table_name} i
                   LEFT JOIN {$wpdb->prefix}cdc_personas p ON i.persona_id = p.id
                   WHERE i.taller_id = %d";
