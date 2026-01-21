@@ -117,6 +117,17 @@
              */
             update: function(id, data) {
                 return CDCAPI.request('personas/' + id, 'PUT', data);
+            },
+
+            /**
+             * Get cuotas for a persona
+             * @param {number} id Persona ID
+             * @param {number} anio Year (optional, defaults to current year)
+             * @return {Promise}
+             */
+            cuotas: function(id, anio) {
+                const params = anio ? { anio: anio } : {};
+                return CDCAPI.request('personas/' + id + '/cuotas', 'GET', params);
             }
         },
 
