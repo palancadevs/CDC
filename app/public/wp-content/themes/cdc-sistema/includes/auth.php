@@ -192,11 +192,14 @@ add_action('init', 'cdc_create_user_role');
  * Override display name with persona name
  *
  * @param string $display_name Original display name
- * @param int $user_id User ID
- * @param object $user User object
  * @return string Modified display name
  */
-function cdc_override_display_name($display_name, $user_id, $user) {
+function cdc_override_display_name($display_name) {
+    // Only modify if user is logged in
+    if (!is_user_logged_in()) {
+        return $display_name;
+    }
+
     $persona = cdc_get_current_persona();
 
     if ($persona) {
@@ -205,4 +208,4 @@ function cdc_override_display_name($display_name, $user_id, $user) {
 
     return $display_name;
 }
-add_filter('pre_user_display_name', 'cdc_override_display_name', 10, 3);
+add_filter('pre_user_display_name', 'cdc_override_display_name', 10, 1);
