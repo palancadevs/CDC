@@ -229,7 +229,7 @@ jQuery(document).ready(function($) {
 
     // Edit taller button
     $('#cdc-edit-taller').on('click', function() {
-        CDC.showNotification('Funcionalidad en desarrollo', 'info');
+        window.location.href = cdcData.homeUrl + '/editar-taller?id=' + tallerId;
     });
 
     // Inscribir button
@@ -264,9 +264,23 @@ jQuery(document).ready(function($) {
         }
     });
 
-    // Dar de baja inscripcion (placeholder - endpoint not yet implemented)
+    // Dar de baja inscripcion
     function darDeBajaInscripcion(inscripcionId) {
-        CDC.showNotification('Funcionalidad en desarrollo', 'info');
+        CDCAPI.talleres.darDeBajaInscripcion(tallerId, inscripcionId, {
+            fecha_baja: new Date().toISOString().split('T')[0]
+        })
+            .then(function(response) {
+                if (response.success) {
+                    CDC.showNotification('Inscripción dada de baja correctamente', 'success');
+                    loadTaller(); // Reload to update counter
+                    loadInscripciones(); // Reload inscripciones list
+                } else {
+                    CDC.handleApiError(response, 'Dar de baja');
+                }
+            })
+            .catch(function(error) {
+                CDC.handleApiError(error, 'Dar de baja');
+            });
     }
 
     // Open inscribir modal (reuse modal from page-talleres.php)

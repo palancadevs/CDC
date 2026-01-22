@@ -156,6 +156,23 @@ class CDC_Sala_Service {
      * @return array
      */
     public function get_upcoming_reservas($sala_id = null) {
-        return $this->reserva_model->get_upcoming($sala_id);
+        global $wpdb;
+
+        $reservas_table = $wpdb->prefix . 'cdc_reservas_salas';
+        $personas_table = $wpdb->prefix . 'cdc_personas';
+        $now = current_time('mysql');
+
+        $sql = "SELECT r.*, p.nombre as persona_nombre, p.apellido as persona_apellido, p.dni as persona_dni
+                FROM $reservas_table r
+                LEFT JOIN $personas_table p ON r.persona_id = p.id
+                WHERE r.fecha_inicio >= %s";
+
+        if ($sala_id) {
+            $sql .= $wpdb->prepare(" AND r.sala_id = %d", $sala_id);
+        }
+
+        $sql .= " ORDER BY r.fecha_inicio ASC";
+
+        return $wpdb->get_results($wpdb->prepare($sql, $now));
     }
 }

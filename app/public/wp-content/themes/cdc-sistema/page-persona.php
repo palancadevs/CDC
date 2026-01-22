@@ -107,12 +107,27 @@ jQuery(document).ready(function($) {
             </div>`;
         }
 
+        // Historial de movimientos
+        html += `<div class="cdc-card">
+            <div class="cdc-card-header">
+                <h3 class="cdc-card-title">Historial de Movimientos</h3>
+            </div>
+            <div class="cdc-card-body">
+                <div id="cdc-movimientos-list">
+                    <p class="cdc-text-center cdc-text-muted">Cargando historial...</p>
+                </div>
+            </div>
+        </div>`;
+
         $('#cdc-persona-detail').html(html);
 
         // Load cuotas if socio
         if (persona.tipo === 'socio' || persona.tipo === 'ambos') {
             loadCuotas(personaId);
         }
+
+        // Load movimientos
+        loadMovimientos(personaId);
     }
 
     function loadCuotas(personaId) {
@@ -196,6 +211,52 @@ jQuery(document).ready(function($) {
 
         html += '</div></div>';
         $('#cdc-cuotas-grid').html(html);
+    }
+
+    // Load movimientos
+    function loadMovimientos(personaId) {
+        CDCAPI.personas.movimientos(personaId, { limit: 20 })
+            .then(function(response) {
+                if (response.success) {
+                    renderMovimientos(response.data);
+                } else {
+                    $('#cdc-movimientos-list').html('<p class="cdc-text-muted">Error al cargar historial.</p>');
+                }
+            })
+            .catch(function(error) {
+                $('#cdc-movimientos-list').html('<p class="cdc-text-muted">Error al cargar historial.</p>');
+                console.error('Error loading movimientos:', error);
+            });
+    }
+
+    // Render movimientos
+    function renderMovimientos(movimientos) {
+        if (!movimientos || movimientos.length === 0) {
+            $('#cdc-movimientos-list').html('<p class="cdc-text-center cdc-text-muted">No hay movimientos registrados.</p>');
+            return;
+        }
+
+        let html = '<div class="cdc-table-wrapper"><table class="cdc-table">';
+        html += '<thead><tr><th>Fecha</th><th>Tipo</th><th>Concepto</th><th>Monto</th><th>Recibo</th></tr></thead><tbody>';
+
+        movimientos.forEach(function(m) {
+            const fecha = new Date(m.fecha_movimiento).toLocaleString('es-AR');
+            const monto = parseFloat(m.monto).toFixed(2);
+            const tipoClass = m.tipo === 'ingreso' ? 'cdc-badge-success' : 'cdc-badge-secondary';
+            const concepto = m.recibo_concepto || m.concepto || '-';
+            const recibo = m.numero_recibo || '-';
+
+            html += '<tr>';
+            html += `<td>${fecha}</td>`;
+            html += `<td><span class="cdc-badge ${tipoClass}">${m.tipo}</span></td>`;
+            html += `<td>${concepto}</td>`;
+            html += `<td><strong>$${monto}</strong></td>`;
+            html += `<td>${recibo}</td>`;
+            html += '</tr>';
+        });
+
+        html += '</tbody></table></div>';
+        $('#cdc-movimientos-list').html(html);
     }
 });
 </script>

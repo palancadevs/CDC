@@ -78,6 +78,15 @@ class CDC_Salas_Controller extends CDC_Base_Controller {
                 'permission_callback' => array($this, 'check_auth'),
             ),
         ));
+
+        // GET /salas/{id}/reservas - Get reservas for sala
+        register_rest_route($this->namespace, '/' . $this->rest_base . '/(?P<id>[\d]+)/reservas', array(
+            array(
+                'methods' => WP_REST_Server::READABLE,
+                'callback' => array($this, 'get_reservas'),
+                'permission_callback' => array($this, 'check_auth'),
+            ),
+        ));
     }
 
     /**
@@ -167,5 +176,21 @@ class CDC_Salas_Controller extends CDC_Base_Controller {
         }
 
         return $this->prepare_response($result, 201);
+    }
+
+    /**
+     * Get reservas for sala
+     *
+     * @param WP_REST_Request $request Request object
+     * @return WP_REST_Response
+     */
+    public function get_reservas($request) {
+        $sala_id = $request->get_param('id');
+        $reservas = $this->service->get_upcoming_reservas($sala_id);
+
+        return $this->prepare_response(array(
+            'success' => true,
+            'data' => $reservas,
+        ));
     }
 }

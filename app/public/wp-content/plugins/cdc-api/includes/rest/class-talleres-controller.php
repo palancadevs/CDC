@@ -93,6 +93,15 @@ class CDC_Talleres_Controller extends CDC_Base_Controller {
                 'permission_callback' => array($this, 'check_auth'),
             ),
         ));
+
+        // PUT /talleres/{taller_id}/inscripciones/{inscripcion_id}/baja - Dar de baja inscripcion
+        register_rest_route($this->namespace, '/' . $this->rest_base . '/(?P<taller_id>[\d]+)/inscripciones/(?P<inscripcion_id>[\d]+)/baja', array(
+            array(
+                'methods' => WP_REST_Server::EDITABLE,
+                'callback' => array($this, 'dar_de_baja_inscripcion'),
+                'permission_callback' => array($this, 'check_auth'),
+            ),
+        ));
     }
 
     /**
@@ -207,5 +216,24 @@ class CDC_Talleres_Controller extends CDC_Base_Controller {
             'success' => true,
             'data' => $inscripciones,
         ));
+    }
+
+    /**
+     * Dar de baja inscripcion
+     *
+     * @param WP_REST_Request $request Request object
+     * @return WP_REST_Response|WP_Error
+     */
+    public function dar_de_baja_inscripcion($request) {
+        $inscripcion_id = $request->get_param('inscripcion_id');
+        $data = $request->get_json_params();
+
+        $result = $this->inscripcion_service->dar_de_baja($inscripcion_id, $data);
+
+        if (!$result['success']) {
+            return $this->prepare_error($result['message'], 400);
+        }
+
+        return $this->prepare_response($result);
     }
 }
