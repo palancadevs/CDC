@@ -71,7 +71,7 @@ class CDC_Sala extends CDC_Base_Model {
         $query = $wpdb->prepare(
             "SELECT COUNT(*) FROM $reservas_table
             WHERE sala_id = %d
-            AND estado IN ('confirmada', 'en_curso')
+            AND estado IN ('pendiente', 'confirmada', 'en_curso')
             AND (
                 (fecha_inicio <= %s AND fecha_fin >= %s) OR
                 (fecha_inicio <= %s AND fecha_fin >= %s) OR

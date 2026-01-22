@@ -94,6 +94,15 @@ class CDC_Personas_Controller extends CDC_Base_Controller {
                 'permission_callback' => array($this, 'check_auth'),
             ),
         ));
+
+        // GET /personas/{id}/movimientos - Get movimientos de caja for a persona
+        register_rest_route($this->namespace, '/' . $this->rest_base . '/(?P<id>[\d]+)/movimientos', array(
+            array(
+                'methods' => WP_REST_Server::READABLE,
+                'callback' => array($this, 'get_movimientos'),
+                'permission_callback' => array($this, 'check_auth'),
+            ),
+        ));
     }
 
     /**
@@ -103,6 +112,8 @@ class CDC_Personas_Controller extends CDC_Base_Controller {
      * @return WP_REST_Response
      */
     public function get_items($request) {
+        global $wpdb;
+
         // Build query args
         $args = array(
             'limit' => $request->get_param('per_page') ?: 50,
@@ -119,6 +130,18 @@ class CDC_Personas_Controller extends CDC_Base_Controller {
         $estado = $request->get_param('estado');
         if ($estado && in_array($estado, array('activo', 'inactivo'))) {
             $args['estado'] = $estado;
+        }
+
+        // Order by
+        $orderby = $request->get_param('orderby');
+        $allowed_orderby = array('nombre', 'apellido', 'dni', 'created_at', 'tipo');
+        if ($orderby && in_array($orderby, $allowed_orderby)) {
+            $args['orderby'] = $orderby;
+        }
+
+        $order = $request->get_param('order');
+        if ($order && in_array(strtoupper($order), array('ASC', 'DESC'))) {
+            $args['order'] = strtoupper($order);
         }
 
         // Search query
@@ -255,6 +278,38 @@ class CDC_Personas_Controller extends CDC_Base_Controller {
         return $this->prepare_response(array(
             'success' => true,
             'data' => $cuotas,
+        ));
+    }
+
+    /**
+     * Get movimientos de caja for persona
+     *
+     * @param WP_REST_Request $request Request object
+     * @return WP_REST_Response
+     */
+    public function get_movimientos($request) {
+        global $wpdb;
+
+        $persona_id = $request->get_param('id');
+        $limit = $request->get_param('limit') ?: 50;
+        $offset = $request->get_param('offset') ?: 0;
+
+        $movimientos_table = $wpdb->prefix . 'cdc_movimientos_caja';
+        $recibos_table = $wpdb->prefix . 'cdc_recibos';
+
+        // Get movimientos related to this persona through recibos
+        $sql = "SELECT m.*, r.numero_recibo, r.concepto as recibo_concepto
+                FROM $movimientos_table m
+                LEFT JOIN $recibos_table r ON m.recibo_id = r.id
+                WHERE r.persona_id = %d
+                ORDER BY m.fecha_movimiento DESC
+                LIMIT %d OFFSET %d";
+
+        $movimientos = $wpdb->get_results($wpdb->prepare($sql, $persona_id, $limit, $offset));
+
+        return $this->prepare_response(array(
+            'success' => true,
+            'data' => $movimientos,
         ));
     }
 }

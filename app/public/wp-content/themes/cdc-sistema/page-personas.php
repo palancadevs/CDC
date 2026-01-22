@@ -36,6 +36,16 @@ get_header();
                     <button class="cdc-tab" data-filter="clientes">Clientes</button>
                 </div>
 
+                <!-- Advanced Filters -->
+                <div class="cdc-advanced-filters">
+                    <select id="cdc-filter-orden" class="cdc-form-control">
+                        <option value="apellido">Ordenar por Apellido</option>
+                        <option value="nombre">Ordenar por Nombre</option>
+                        <option value="created_at">Ordenar por Fecha Alta</option>
+                        <option value="dni">Ordenar por DNI</option>
+                    </select>
+                </div>
+
                 <!-- Search -->
                 <div class="cdc-search-wrapper">
                     <input type="text"
@@ -72,6 +82,9 @@ jQuery(document).ready(function($) {
         loadPersonas();
     });
 
+    // Advanced filters change
+    $('#cdc-filter-orden').on('change', loadPersonas);
+
     // Search
     $('#cdc-search-btn').on('click', loadPersonas);
     $('#cdc-personas-search').on('keypress', function(e) {
@@ -83,6 +96,7 @@ jQuery(document).ready(function($) {
     // Load personas function
     function loadPersonas() {
         const query = $('#cdc-personas-search').val().trim();
+        const orden = $('#cdc-filter-orden').val();
         const $results = $('#cdc-personas-results');
 
         $results.html('<p class="cdc-text-center cdc-text-muted">Cargando...</p>');
@@ -94,6 +108,12 @@ jQuery(document).ready(function($) {
             filters.tipo = 'socio';
         } else if (currentFilter === 'clientes') {
             filters.tipo = 'cliente';
+        }
+
+        // Order by
+        if (orden) {
+            filters.orderby = orden;
+            filters.order = 'ASC';
         }
 
         // Search query (only if 3+ characters)
@@ -123,5 +143,28 @@ jQuery(document).ready(function($) {
     loadPersonas();
 });
 </script>
+
+<style>
+.cdc-advanced-filters {
+    display: flex;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.cdc-advanced-filters select {
+    flex: 1;
+    max-width: 200px;
+}
+
+@media (max-width: 768px) {
+    .cdc-advanced-filters {
+        flex-direction: column;
+    }
+
+    .cdc-advanced-filters select {
+        max-width: 100%;
+    }
+}
+</style>
 
 <?php get_footer(); ?>

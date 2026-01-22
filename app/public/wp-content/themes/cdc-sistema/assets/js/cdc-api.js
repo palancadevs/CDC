@@ -128,6 +128,17 @@
             cuotas: function(id, anio) {
                 const params = anio ? { anio: anio } : {};
                 return CDCAPI.request('personas/' + id + '/cuotas', 'GET', params);
+            },
+
+            /**
+             * Get movimientos de caja for persona
+             * @param {number} id Persona ID
+             * @param {object} params Optional parameters (limit, offset)
+             * @return {Promise}
+             */
+            movimientos: function(id, params) {
+                params = params || {};
+                return CDCAPI.request('personas/' + id + '/movimientos', 'GET', params);
             }
         },
 
@@ -369,6 +380,18 @@
             inscripciones: function(taller_id, estado) {
                 const params = estado ? { estado: estado } : {};
                 return CDCAPI.request('talleres/' + taller_id + '/inscripciones', 'GET', params);
+            },
+
+            /**
+             * Dar de baja inscripcion
+             * @param {number} taller_id Taller ID
+             * @param {number} inscripcion_id Inscripcion ID
+             * @param {object} data Optional data (fecha_baja, notas)
+             * @return {Promise}
+             */
+            darDeBajaInscripcion: function(taller_id, inscripcion_id, data) {
+                data = data || {};
+                return CDCAPI.request('talleres/' + taller_id + '/inscripciones/' + inscripcion_id + '/baja', 'PUT', data);
             }
         },
 
@@ -460,6 +483,15 @@
              */
             reservar: function(data) {
                 return CDCAPI.request('salas/reservas', 'POST', data);
+            },
+
+            /**
+             * Get reservas for sala
+             * @param {number} sala_id Sala ID
+             * @return {Promise}
+             */
+            reservas: function(sala_id) {
+                return CDCAPI.request('salas/' + sala_id + '/reservas');
             }
         }
     };
