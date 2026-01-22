@@ -266,17 +266,17 @@ class CDC_Talleres_Controller extends CDC_Base_Controller {
 
         foreach ($talleres as $taller) {
             $taller_data = array(
-                'nombre' => $taller['nombre'],
-                'precio_mensual' => $taller['precio_mensual'],
-                'descripcion' => isset($taller['descripcion']) ? $taller['descripcion'] : '',
+                'nombre' => $taller->nombre,
+                'precio_mensual' => $taller->precio_mensual,
+                'descripcion' => isset($taller->descripcion) ? $taller->descripcion : '',
             );
 
-            $product_id = $this->wc_service->sync_taller_product($taller['id'], $taller_data);
+            $product_id = $this->wc_service->sync_taller_product($taller->id, $taller_data);
 
             if ($product_id) {
                 $synced++;
             } else {
-                $errors[] = 'Error syncing taller ID: ' . $taller['id'];
+                $errors[] = 'Error syncing taller ID: ' . $taller->id;
             }
         }
 
