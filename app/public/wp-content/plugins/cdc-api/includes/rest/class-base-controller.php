@@ -21,61 +21,60 @@ abstract class CDC_Base_Controller extends WP_REST_Controller {
     /**
      * Check if user is authenticated
      *
-     * PHASE 1: Authentication disabled for testing/development
-     * TODO: Enable authentication in future phase
-     *
      * @param WP_REST_Request $request Request object
      * @return bool|WP_Error
      */
     public function check_auth($request) {
-        // PHASE 1: Allow all requests without authentication
-        return true;
+        if (!is_user_logged_in()) {
+            return new WP_Error(
+                'rest_forbidden',
+                __('No tiene permisos para realizar esta acción', 'cdc-api'),
+                array('status' => 401)
+            );
+        }
 
-        // FUTURE PHASE: Uncomment this when authentication is implemented
-        // if (!is_user_logged_in()) {
-        //     return new WP_Error(
-        //         'rest_forbidden',
-        //         __('No tiene permisos para realizar esta acción', 'cdc-api'),
-        //         array('status' => 401)
-        //     );
-        // }
-        //
-        // return true;
+        return true;
     }
 
     /**
-     * Check if user has specific role
+     * Check if user has specific role or capability
      *
-     * PHASE 1: Role-based permissions disabled for testing/development
-     * TODO: Enable role-based permissions in future phase
-     *
-     * @param array $roles Allowed roles
+     * @param array $roles_or_caps Allowed roles or capabilities
      * @return bool|WP_Error
      */
-    public function check_role($roles = array()) {
-        // PHASE 1: Allow all requests without role checking
-        return true;
+    public function check_role($roles_or_caps = array()) {
+        if (!is_user_logged_in()) {
+            return new WP_Error(
+                'rest_forbidden',
+                __('No tiene permisos para realizar esta acción', 'cdc-api'),
+                array('status' => 401)
+            );
+        }
 
-        // FUTURE PHASE: Uncomment this when authentication is implemented
-        // if (!is_user_logged_in()) {
-        //     return new WP_Error(
-        //         'rest_forbidden',
-        //         __('No tiene permisos para realizar esta acción', 'cdc-api'),
-        //         array('status' => 401)
-        //     );
-        // }
-        //
-        // $user = wp_get_current_user();
-        //
-        // if (!array_intersect($roles, $user->roles) && !in_array('administrator', $user->roles)) {
-        //     return new WP_Error(
-        //         'rest_forbidden',
-        //         __('No tiene permisos suficientes', 'cdc-api'),
-        //         array('status' => 403)
-        //     );
-        // }
-        //
-        // return true;
+        $user = wp_get_current_user();
+
+        // Administrator always has access
+        if (in_array('administrator', $user->roles) || $user->has_cap('cdc_full_access')) {
+            return true;
+        }
+
+        // Check if user has any of the specified roles
+        if (array_intersect($roles_or_caps, $user->roles)) {
+            return true;
+        }
+
+        // Check if user has any of the specified capabilities
+        foreach ($roles_or_caps as $cap) {
+            if ($user->has_cap($cap)) {
+                return true;
+            }
+        }
+
+        return new WP_Error(
+            'rest_forbidden',
+            __('No tiene permisos suficientes para esta acción', 'cdc-api'),
+            array('status' => 403)
+        );
     }
 
     /**

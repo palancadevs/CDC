@@ -10,35 +10,14 @@ if (!defined('ABSPATH')) {
 }
 
 /**
- * PHASE 1: Auto-login bypass for development
- * Automatically logs in an admin user to bypass authentication
+ * PHASE 1: Auto-login bypass DISABLED
+ * Authentication is now required via DNI login
  */
-function cdc_phase1_auto_login() {
-    // Skip for AJAX, REST, and admin
-    if (defined('DOING_AJAX') && DOING_AJAX) return;
-    if (defined('REST_REQUEST') && REST_REQUEST) return;
-    if (is_admin()) return;
-
-    // If already logged in, nothing to do
-    if (is_user_logged_in()) {
-        return;
-    }
-
-    // Auto-login as admin (ID 1) for Phase 1 testing
-    $user_id = 1;
-    $user = get_user_by('id', $user_id);
-
-    if ($user) {
-        wp_set_current_user($user_id);
-        wp_set_auth_cookie($user_id);
-        do_action('wp_login', $user->user_login, $user);
-    }
-}
-add_action('init', 'cdc_phase1_auto_login');
+// DISABLED: Auto-login no longer needed with DNI authentication
+// function cdc_phase1_auto_login() { ... }
 
 /**
  * Check authentication and redirect if necessary
- * DISABLED FOR PHASE 1
  */
 function cdc_check_authentication() {
     // Skip for AJAX requests
@@ -101,7 +80,7 @@ function cdc_check_authentication() {
     // Verify persona still exists in database
     global $wpdb;
     $persona_exists = $wpdb->get_var($wpdb->prepare(
-        "SELECT COUNT(*) FROM {$wpdb->prefix}cdc_personas WHERE id = %d",
+        "SELECT COUNT(*) FROM {$wpdb->prefix}cdc_persona WHERE id = %d",
         $persona_id
     ));
 
@@ -112,8 +91,7 @@ function cdc_check_authentication() {
         exit;
     }
 }
-// DISABLED FOR PHASE 1 - No authentication required during development
-// add_action('template_redirect', 'cdc_check_authentication');
+add_action('template_redirect', 'cdc_check_authentication');
 
 /**
  * Modify logout redirect URL
