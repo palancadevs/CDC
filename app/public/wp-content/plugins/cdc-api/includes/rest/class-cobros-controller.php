@@ -34,12 +34,18 @@ class CDC_Cobros_Controller extends CDC_Base_Controller {
     private $movimiento_caja_model;
 
     /**
+     * WooCommerce service
+     */
+    private $wc_service;
+
+    /**
      * Constructor
      */
     public function __construct() {
         $this->cuota_socio_model = new CDC_Cuota_Socio();
         $this->cuota_taller_model = new CDC_Cuota_Taller();
         $this->movimiento_caja_model = new CDC_Movimiento_Caja();
+        $this->wc_service = new CDC_WooCommerce_Service();
     }
 
     /**
@@ -205,6 +211,48 @@ class CDC_Cobros_Controller extends CDC_Base_Controller {
                 throw new Exception('Error al crear movimiento de caja');
             }
 
+            // Create WooCommerce order
+            $product_id = $this->wc_service->get_or_create_cuota_socio_product();
+
+            if (!$product_id) {
+                throw new Exception('Error al obtener producto de cuota socio');
+            }
+
+            $order_args = array(
+                'customer_id' => 0, // Guest checkout for now
+                'items' => array(
+                    array(
+                        'product_id' => $product_id,
+                        'quantity' => count($cuota_ids),
+                        'price' => $monto_total,
+                    ),
+                ),
+                'meta_data' => array(
+                    '_cdc_movimiento_id' => $movimiento_id,
+                    '_cdc_persona_id' => $persona_id,
+                    '_cdc_tipo_cobro' => 'cuota_socio',
+                    '_cdc_cuota_ids' => implode(',', $cuota_ids),
+                ),
+                'payment_method' => $medio_pago,
+                'status' => 'processing',
+                'mark_paid' => true,
+            );
+
+            $order_id = $this->wc_service->create_order($order_args);
+
+            if (is_wp_error($order_id)) {
+                throw new Exception('Error al crear orden WooCommerce: ' . $order_id->get_error_message());
+            }
+
+            // Update movimiento with order_id (store in notas for now)
+            $wpdb->update(
+                $wpdb->prefix . 'cdc_movimientos_caja',
+                array('notas' => $observaciones . ' [WC Order: ' . $order_id . ']'),
+                array('id' => $movimiento_id),
+                array('%s'),
+                array('%d')
+            );
+
             // Commit transaction
             $wpdb->query('COMMIT');
 
@@ -213,6 +261,7 @@ class CDC_Cobros_Controller extends CDC_Base_Controller {
                 'message' => 'Cuota(s) cobrada(s) correctamente',
                 'data' => array(
                     'movimiento_id' => $movimiento_id,
+                    'order_id' => $order_id,
                     'monto_total' => $monto_total,
                     'cuotas_pagadas' => $cuotas_pagadas,
                     'saldo_nuevo' => $saldo_nuevo,
@@ -352,6 +401,61 @@ class CDC_Cobros_Controller extends CDC_Base_Controller {
                 throw new Exception('Error al crear movimiento de caja');
             }
 
+            // Create WooCommerce order for taller cuota
+            // Get taller_id from first cuota
+            $first_cuota = reset($cuotas_pagadas);
+            $taller_id = $first_cuota['taller_id'];
+
+            // Get taller data and sync product
+            $taller_model = new CDC_Taller();
+            $taller = $taller_model->find($taller_id);
+
+            if ($taller) {
+                $taller_data = array(
+                    'nombre' => $taller->nombre,
+                    'precio_mensual' => $taller->precio_mensual,
+                    'descripcion' => isset($taller->descripcion) ? $taller->descripcion : '',
+                );
+
+                $product_id = $this->wc_service->sync_taller_product($taller_id, $taller_data);
+
+                if ($product_id) {
+                    $order_args = array(
+                        'customer_id' => 0, // Guest checkout for now
+                        'items' => array(
+                            array(
+                                'product_id' => $product_id,
+                                'quantity' => count($cuota_ids),
+                                'price' => $monto_total,
+                            ),
+                        ),
+                        'meta_data' => array(
+                            '_cdc_movimiento_id' => $movimiento_id,
+                            '_cdc_persona_id' => $persona_id,
+                            '_cdc_taller_id' => $taller_id,
+                            '_cdc_tipo_cobro' => 'cuota_taller',
+                            '_cdc_cuota_ids' => implode(',', $cuota_ids),
+                        ),
+                        'payment_method' => $medio_pago,
+                        'status' => 'processing',
+                        'mark_paid' => true,
+                    );
+
+                    $order_id = $this->wc_service->create_order($order_args);
+
+                    if (!is_wp_error($order_id)) {
+                        // Update movimiento with order_id
+                        $wpdb->update(
+                            $wpdb->prefix . 'cdc_movimientos_caja',
+                            array('notas' => $observaciones . ' [WC Order: ' . $order_id . ']'),
+                            array('id' => $movimiento_id),
+                            array('%s'),
+                            array('%d')
+                        );
+                    }
+                }
+            }
+
             // Commit transaction
             $wpdb->query('COMMIT');
 
@@ -360,6 +464,7 @@ class CDC_Cobros_Controller extends CDC_Base_Controller {
                 'message' => 'Cuota(s) de taller cobrada(s) correctamente',
                 'data' => array(
                     'movimiento_id' => $movimiento_id,
+                    'order_id' => isset($order_id) ? $order_id : null,
                     'monto_total' => $monto_total,
                     'cuotas_pagadas' => $cuotas_pagadas,
                     'saldo_nuevo' => $saldo_nuevo,

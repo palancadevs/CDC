@@ -166,13 +166,15 @@ class CDC_Database_Schema {
             usuario_id bigint(20) unsigned NOT NULL,
             fecha_movimiento datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
             notas text DEFAULT NULL,
+            comprobante_id varchar(100) DEFAULT NULL,
             created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             KEY tipo (tipo),
             KEY fecha_movimiento (fecha_movimiento),
             KEY usuario_id (usuario_id),
             KEY recibo_id (recibo_id),
-            KEY gasto_id (gasto_id)
+            KEY gasto_id (gasto_id),
+            KEY comprobante_id (comprobante_id)
         ) $charset_collate;";
         dbDelta($sql_movimientos);
 
@@ -333,6 +335,7 @@ class CDC_Database_Schema {
             estado enum('pendiente','confirmada','en_curso','finalizada','cancelada') NOT NULL DEFAULT 'pendiente',
             motivo varchar(255) DEFAULT NULL,
             recibo_id bigint(20) unsigned DEFAULT NULL,
+            comprobante_id varchar(100) DEFAULT NULL,
             notas text DEFAULT NULL,
             created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
             updated_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -342,7 +345,8 @@ class CDC_Database_Schema {
             KEY fecha_inicio (fecha_inicio),
             KEY fecha_fin (fecha_fin),
             KEY estado (estado),
-            KEY recibo_id (recibo_id)
+            KEY recibo_id (recibo_id),
+            KEY comprobante_id (comprobante_id)
         ) $charset_collate;";
         dbDelta($sql_reservas);
 
