@@ -37,12 +37,12 @@ abstract class CDC_Base_Controller extends WP_REST_Controller {
     }
 
     /**
-     * Check if user has specific role
+     * Check if user has specific role or capability
      *
-     * @param array $roles Allowed roles
+     * @param array $roles_or_caps Allowed roles or capabilities
      * @return bool|WP_Error
      */
-    public function check_role($roles = array()) {
+    public function check_role($roles_or_caps = array()) {
         if (!is_user_logged_in()) {
             return new WP_Error(
                 'rest_forbidden',
@@ -53,15 +53,28 @@ abstract class CDC_Base_Controller extends WP_REST_Controller {
 
         $user = wp_get_current_user();
 
-        if (!array_intersect($roles, $user->roles) && !in_array('administrator', $user->roles)) {
-            return new WP_Error(
-                'rest_forbidden',
-                __('No tiene permisos suficientes', 'cdc-api'),
-                array('status' => 403)
-            );
+        // Administrator always has access
+        if (in_array('administrator', $user->roles) || $user->has_cap('cdc_full_access')) {
+            return true;
         }
 
-        return true;
+        // Check if user has any of the specified roles
+        if (array_intersect($roles_or_caps, $user->roles)) {
+            return true;
+        }
+
+        // Check if user has any of the specified capabilities
+        foreach ($roles_or_caps as $cap) {
+            if ($user->has_cap($cap)) {
+                return true;
+            }
+        }
+
+        return new WP_Error(
+            'rest_forbidden',
+            __('No tiene permisos suficientes para esta acción', 'cdc-api'),
+            array('status' => 403)
+        );
     }
 
     /**

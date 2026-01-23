@@ -29,11 +29,17 @@ class CDC_Talleres_Controller extends CDC_Base_Controller {
     private $inscripcion_service;
 
     /**
+     * WooCommerce service instance
+     */
+    private $wc_service;
+
+    /**
      * Constructor
      */
     public function __construct() {
         $this->service = new CDC_Taller_Service();
         $this->inscripcion_service = new CDC_Inscripcion_Service();
+        $this->wc_service = new CDC_WooCommerce_Service();
     }
 
     /**
@@ -99,6 +105,15 @@ class CDC_Talleres_Controller extends CDC_Base_Controller {
             array(
                 'methods' => WP_REST_Server::EDITABLE,
                 'callback' => array($this, 'dar_de_baja_inscripcion'),
+                'permission_callback' => array($this, 'check_auth'),
+            ),
+        ));
+
+        // POST /talleres/sync-wc-products - Sync all talleres as WooCommerce products
+        register_rest_route($this->namespace, '/' . $this->rest_base . '/sync-wc-products', array(
+            array(
+                'methods' => WP_REST_Server::CREATABLE,
+                'callback' => array($this, 'sync_wc_products'),
                 'permission_callback' => array($this, 'check_auth'),
             ),
         ));
@@ -235,5 +250,44 @@ class CDC_Talleres_Controller extends CDC_Base_Controller {
         }
 
         return $this->prepare_response($result);
+    }
+
+    /**
+     * Sync all talleres as WooCommerce products
+     *
+     * @param WP_REST_Request $request Request object
+     * @return WP_REST_Response
+     */
+    public function sync_wc_products($request) {
+        $talleres = $this->service->get_all_talleres();
+
+        $synced = 0;
+        $errors = array();
+
+        foreach ($talleres as $taller) {
+            $taller_data = array(
+                'nombre' => $taller->nombre,
+                'precio_mensual' => $taller->precio_mensual,
+                'descripcion' => isset($taller->descripcion) ? $taller->descripcion : '',
+            );
+
+            $product_id = $this->wc_service->sync_taller_product($taller->id, $taller_data);
+
+            if ($product_id) {
+                $synced++;
+            } else {
+                $errors[] = 'Error syncing taller ID: ' . $taller->id;
+            }
+        }
+
+        return $this->prepare_response(array(
+            'success' => true,
+            'message' => "Sincronizados $synced talleres como productos WooCommerce",
+            'data' => array(
+                'total_talleres' => count($talleres),
+                'synced' => $synced,
+                'errors' => $errors,
+            ),
+        ));
     }
 }

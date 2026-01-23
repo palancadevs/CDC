@@ -195,5 +195,110 @@ if (is_user_logged_in()) {
     </div>
 
     <?php wp_footer(); ?>
+
+    <script>
+    jQuery(document).ready(function($) {
+        console.log('🟢 Login page loaded');
+
+        const $form = $('#cdc-login-form');
+        const $submitBtn = $('#cdc-login-submit');
+        const $dniInput = $('#cdc-dni');
+        const $errorBox = $('#cdc-login-error');
+        const $loadingBox = $('#cdc-login-loading');
+
+        // Show error message
+        function showError(message) {
+            $errorBox.html('<strong>Error:</strong> ' + message);
+            $errorBox.show();
+            $loadingBox.hide();
+            $form.show();
+            $submitBtn.prop('disabled', false);
+        }
+
+        // Show loading
+        function showLoading() {
+            $form.hide();
+            $errorBox.hide();
+            $loadingBox.show();
+        }
+
+        // Handle form submit
+        $form.on('submit', function(e) {
+            e.preventDefault();
+
+            const dni = $dniInput.val().trim();
+
+            console.log('📝 Attempting login with DNI:', dni);
+
+            if (!dni) {
+                showError('Por favor ingrese su DNI');
+                return;
+            }
+
+            // Validate DNI format (7-8 digits)
+            if (!/^\d{7,8}$/.test(dni)) {
+                showError('El DNI debe tener 7 u 8 dígitos sin puntos ni espacios');
+                return;
+            }
+
+            $submitBtn.prop('disabled', true);
+            showLoading();
+
+            // Call login endpoint
+            $.ajax({
+                url: '<?php echo rest_url('cdc/v1/auth/login'); ?>',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ dni: dni }),
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-WP-Nonce', '<?php echo wp_create_nonce('wp_rest'); ?>');
+                },
+                success: function(response) {
+                    console.log('✅ Login successful:', response);
+
+                    if (response.success) {
+                        // Redirect to dashboard
+                        window.location.href = '<?php echo home_url('/'); ?>';
+                    } else {
+                        showError(response.message || 'Error al autenticar');
+                    }
+                },
+                error: function(xhr) {
+                    console.error('❌ Login error:', xhr);
+
+                    let message = 'Error al autenticar. Por favor intente nuevamente.';
+
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        message = xhr.responseJSON.message;
+                    } else if (xhr.status === 401) {
+                        message = 'DNI no encontrado en el sistema. Verifique el número ingresado.';
+                    } else if (xhr.status === 0) {
+                        message = 'No se pudo conectar con el servidor. Verifique su conexión.';
+                    }
+
+                    showError(message);
+                }
+            });
+        });
+
+        // Auto-focus on DNI input
+        $dniInput.focus();
+
+        // Only allow numbers in DNI input
+        $dniInput.on('keypress', function(e) {
+            const charCode = e.which || e.keyCode;
+            // Allow: backspace, delete, tab, escape, enter
+            if (charCode === 8 || charCode === 46 || charCode === 9 || charCode === 27 || charCode === 13) {
+                return true;
+            }
+            // Only allow numbers 0-9
+            if (charCode < 48 || charCode > 57) {
+                e.preventDefault();
+                return false;
+            }
+            return true;
+        });
+    });
+    </script>
 </body>
 </html>

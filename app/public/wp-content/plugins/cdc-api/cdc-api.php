@@ -95,6 +95,8 @@ final class CDC_API {
         require_once CDC_API_PLUGIN_DIR . 'includes/services/class-inscripcion-service.php';
         require_once CDC_API_PLUGIN_DIR . 'includes/services/class-evento-service.php';
         require_once CDC_API_PLUGIN_DIR . 'includes/services/class-sala-service.php';
+        require_once CDC_API_PLUGIN_DIR . 'includes/services/class-woocommerce-service.php';
+        require_once CDC_API_PLUGIN_DIR . 'includes/services/class-arca-service.php';
 
         // Base REST Controller
         require_once CDC_API_PLUGIN_DIR . 'includes/rest/class-base-controller.php';
@@ -107,6 +109,8 @@ final class CDC_API {
         require_once CDC_API_PLUGIN_DIR . 'includes/rest/class-talleres-controller.php';
         require_once CDC_API_PLUGIN_DIR . 'includes/rest/class-eventos-controller.php';
         require_once CDC_API_PLUGIN_DIR . 'includes/rest/class-salas-controller.php';
+        require_once CDC_API_PLUGIN_DIR . 'includes/rest/class-arca-controller.php';
+        require_once CDC_API_PLUGIN_DIR . 'includes/rest/class-auth-controller.php';
     }
 
     /**
@@ -115,6 +119,11 @@ final class CDC_API {
     public function init() {
         // Set up localization
         load_plugin_textdomain('cdc-api', false, dirname(plugin_basename(__FILE__)) . '/languages');
+
+        // Initialize ARCA service to register WooCommerce hooks
+        if (class_exists('WooCommerce')) {
+            new CDC_ARCA_Service();
+        }
     }
 
     /**
@@ -122,6 +131,7 @@ final class CDC_API {
      */
     public function register_rest_routes() {
         $controllers = array(
+            new CDC_Auth_Controller(),
             new CDC_Personas_Controller(),
             new CDC_Recibos_Controller(),
             new CDC_Caja_Controller(),
@@ -129,10 +139,67 @@ final class CDC_API {
             new CDC_Talleres_Controller(),
             new CDC_Eventos_Controller(),
             new CDC_Salas_Controller(),
+            new CDC_ARCA_Controller(),
         );
 
         foreach ($controllers as $controller) {
             $controller->register_routes();
+        }
+    }
+
+    /**
+     * Create custom roles for CDC Sistema
+     */
+    private function create_custom_roles() {
+        // Base capabilities for all CDC roles
+        $base_capabilities = array(
+            'read' => true,
+        );
+
+        // CDC Admin - Full access to everything
+        add_role('cdc_admin', 'CDC Administrador', array_merge($base_capabilities, array(
+            'manage_options' => true,
+            'cdc_full_access' => true,
+            'cdc_manage_catalogs' => true,
+            'cdc_void_transactions' => true,
+            'cdc_retry_invoicing' => true,
+            'cdc_create_personas' => true,
+            'cdc_edit_personas' => true,
+            'cdc_create_payments' => true,
+            'cdc_create_expenses' => true,
+            'cdc_view_reports' => true,
+            'cdc_manage_talleres' => true,
+            'cdc_manage_salas' => true,
+        )));
+
+        // CDC Tesorería - Treasury role
+        add_role('cdc_tesoreria', 'CDC Tesorería', array_merge($base_capabilities, array(
+            'cdc_manage_catalogs' => true,
+            'cdc_void_transactions' => true,
+            'cdc_retry_invoicing' => true,
+            'cdc_create_personas' => true,
+            'cdc_edit_personas' => true,
+            'cdc_create_payments' => true,
+            'cdc_create_expenses' => true,
+            'cdc_view_reports' => true,
+            'cdc_manage_talleres' => true,
+            'cdc_manage_salas' => true,
+        )));
+
+        // CDC Recepción - Reception role (restricted)
+        add_role('cdc_recepcion', 'CDC Recepción', array_merge($base_capabilities, array(
+            'cdc_create_personas' => true,
+            'cdc_create_payments' => true,
+            'cdc_view_reports' => false,
+        )));
+
+        // Grant CDC Admin role to WordPress administrator
+        $admin_role = get_role('administrator');
+        if ($admin_role) {
+            $admin_role->add_cap('cdc_full_access');
+            $admin_role->add_cap('cdc_manage_catalogs');
+            $admin_role->add_cap('cdc_void_transactions');
+            $admin_role->add_cap('cdc_retry_invoicing');
         }
     }
 
@@ -143,11 +210,79 @@ final class CDC_API {
         // Create database tables
         CDC_Database_Schema::create_tables();
 
+        // Create custom roles
+        $this->create_custom_roles();
+
         // Set plugin version
         update_option('cdc_api_version', CDC_API_VERSION);
 
+        // Sync WooCommerce products if WooCommerce is active
+        if (class_exists('WooCommerce')) {
+            $this->sync_woocommerce_products();
+        }
+
         // Flush rewrite rules
         flush_rewrite_rules();
+    }
+
+    /**
+     * Sync WooCommerce products for CDC services
+     */
+    private function sync_woocommerce_products() {
+        $wc_service = new CDC_WooCommerce_Service();
+
+        // Create Cuota Socio product
+        $cuota_socio_product = $wc_service->get_or_create_cuota_socio_product();
+
+        if ($cuota_socio_product) {
+            error_log('CDC: Producto "Cuota Socio" creado/sincronizado - ID: ' . $cuota_socio_product);
+        }
+
+        // Sync all talleres as products
+        $taller_model = new CDC_Taller();
+        $talleres = $taller_model->get_all();
+
+        $synced = 0;
+        foreach ($talleres as $taller) {
+            $taller_data = array(
+                'nombre' => $taller->nombre,
+                'precio_mensual' => $taller->precio_mensual,
+                'descripcion' => isset($taller->descripcion) ? $taller->descripcion : '',
+            );
+
+            $product_id = $wc_service->sync_taller_product($taller->id, $taller_data);
+
+            if ($product_id) {
+                $synced++;
+            }
+        }
+
+        if ($synced > 0) {
+            error_log("CDC: $synced talleres sincronizados como productos WooCommerce");
+        }
+
+        // Sync all salas as products
+        $sala_model = new CDC_Sala();
+        $salas = $sala_model->get_all();
+
+        $synced_salas = 0;
+        foreach ($salas as $sala) {
+            $sala_data = array(
+                'nombre' => $sala->nombre,
+                'precio_hora' => $sala->precio_hora,
+                'descripcion' => isset($sala->descripcion) ? $sala->descripcion : '',
+            );
+
+            $product_id = $wc_service->sync_sala_product($sala->id, $sala_data);
+
+            if ($product_id) {
+                $synced_salas++;
+            }
+        }
+
+        if ($synced_salas > 0) {
+            error_log("CDC: $synced_salas salas sincronizadas como productos WooCommerce");
+        }
     }
 
     /**

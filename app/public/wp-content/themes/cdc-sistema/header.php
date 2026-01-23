@@ -9,31 +9,23 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-// Get current persona data
+// Get current user and persona data
+$current_user = wp_get_current_user();
 $persona = cdc_get_current_persona();
 
-// PHASE 1: If no persona, use WordPress user data
-if (!$persona && is_user_logged_in()) {
-    $current_user = wp_get_current_user();
-    $user_name = $current_user->display_name ?: 'Usuario';
-    $user_role = 'Administrador';
-} else {
-    $user_name = $persona ? $persona->nombre . ' ' . $persona->apellido : 'Usuario';
+// Get user name
+$user_name = $persona ? $persona->nombre . ' ' . $persona->apellido : ($current_user->display_name ?: 'Usuario');
 
-    // Determine role based on persona type
-    $user_role = 'Usuario';
-    if ($persona) {
-        switch ($persona->tipo) {
-            case 'socio':
-                $user_role = 'Socio';
-                break;
-            case 'cliente':
-                $user_role = 'Cliente';
-                break;
-            case 'ambos':
-                $user_role = 'Socio/Cliente';
-                break;
-        }
+// Get user role (system role, not persona type)
+$user_role = 'Usuario';
+if (is_user_logged_in()) {
+    $roles = $current_user->roles;
+    if (in_array('administrator', $roles) || in_array('cdc_admin', $roles)) {
+        $user_role = 'Administrador';
+    } elseif (in_array('cdc_tesoreria', $roles)) {
+        $user_role = 'Tesorería';
+    } elseif (in_array('cdc_recepcion', $roles)) {
+        $user_role = 'Recepción';
     }
 }
 ?>
