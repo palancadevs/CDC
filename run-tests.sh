@@ -22,6 +22,7 @@ TESTS_DIR="$SCRIPT_DIR/tests/integration"
 # Test files
 TEST_SUITE="$TESTS_DIR/test-suite.sh"
 TEST_VALIDATIONS="$TESTS_DIR/test-validations.sh"
+TEST_AUTH="$TESTS_DIR/test-auth.sh"
 
 # Results
 TOTAL_SUITES=0
@@ -55,7 +56,7 @@ echo "Fecha: $(date '+%Y-%m-%d %H:%M:%S')"
 echo ""
 
 # Check if tests exist
-if [ ! -f "$TEST_SUITE" ] || [ ! -f "$TEST_VALIDATIONS" ]; then
+if [ ! -f "$TEST_SUITE" ] || [ ! -f "$TEST_VALIDATIONS" ] || [ ! -f "$TEST_AUTH" ]; then
     echo -e "${RED}Error: Archivos de test no encontrados${NC}"
     exit 1
 fi
@@ -63,6 +64,7 @@ fi
 # Make scripts executable
 chmod +x "$TEST_SUITE"
 chmod +x "$TEST_VALIDATIONS"
+chmod +x "$TEST_AUTH"
 
 # ============================================
 # RUN TEST SUITE 1: Integration Tests
@@ -105,6 +107,26 @@ echo ""
 echo ""
 
 # ============================================
+# RUN TEST SUITE 3: Authentication Tests
+# ============================================
+echo -e "${BLUE}═══════════════════════════════════════════════════════════${NC}"
+echo -e "${BOLD}Suite 3: Tests de Autenticación${NC}"
+echo -e "${BLUE}═══════════════════════════════════════════════════════════${NC}"
+echo ""
+
+((TOTAL_SUITES++))
+if bash "$TEST_AUTH"; then
+    ((PASSED_SUITES++))
+    SUITE3_STATUS="${GREEN}✓ PASSED${NC}"
+else
+    ((FAILED_SUITES++))
+    SUITE3_STATUS="${RED}✗ FAILED${NC}"
+fi
+
+echo ""
+echo ""
+
+# ============================================
 # FINAL REPORT
 # ============================================
 echo -e "${CYAN}"
@@ -122,8 +144,9 @@ echo -e "Suites fallidas:   ${RED}$FAILED_SUITES${NC}"
 echo ""
 
 echo "Resultados por suite:"
-echo -e "  1. Tests de Integración:  $SUITE1_STATUS"
-echo -e "  2. Tests de Validación:   $SUITE2_STATUS"
+echo -e "  1. Tests de Integración:   $SUITE1_STATUS"
+echo -e "  2. Tests de Validación:    $SUITE2_STATUS"
+echo -e "  3. Tests de Autenticación: $SUITE3_STATUS"
 echo ""
 
 # Generate log file

@@ -148,6 +148,9 @@ class CDC_Auth_Controller extends WP_REST_Controller {
         // Get full persona data
         $persona_full = $this->persona_model->get_full_data($persona->id);
 
+        // Generate nonce for REST API requests
+        $nonce = wp_create_nonce('wp_rest');
+
         return new WP_REST_Response(array(
             'success' => true,
             'message' => 'Autenticación exitosa',
@@ -155,6 +158,7 @@ class CDC_Auth_Controller extends WP_REST_Controller {
                 'user_id' => $user_id,
                 'persona' => $persona_full,
                 'role' => $user->roles[0],
+                'nonce' => $nonce,
             ),
         ), 200);
     }

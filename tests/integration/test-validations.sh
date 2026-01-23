@@ -13,6 +13,7 @@ NC='\033[0m'
 
 BASE_URL="http://localhost:10013"
 API_URL="${BASE_URL}/wp-json/cdc/v1"
+COOKIES_FILE="/tmp/cdc-test-cookies-validations.txt"
 
 TESTS_RUN=0
 TESTS_PASSED=0
@@ -48,13 +49,34 @@ clear
 print_header "🔍 CDC Sistema - Tests de Validación"
 
 # ============================================
+# TEST 0: Autenticación (Login)
+# ============================================
+print_header "TEST 0: Autenticación"
+
+print_test "Login como admin para ejecutar tests"
+run_test
+LOGIN_RESPONSE=$(curl -s -c "$COOKIES_FILE" -X POST "$API_URL/auth/login" \
+    -H "Content-Type: application/json" \
+    -d '{"dni":"12345678"}')
+
+if echo "$LOGIN_RESPONSE" | grep -q '"success":true'; then
+    # Extract nonce for subsequent requests
+    NONCE=$(echo "$LOGIN_RESPONSE" | grep -o '"nonce":"[^"]*"' | cut -d'"' -f4)
+    print_success "Autenticación exitosa para tests (Nonce: ${NONCE:0:10}...)"
+else
+    echo -e "${RED}❌ ERROR: No se pudo autenticar. Los tests fallarán.${NC}"
+    echo "Response: $LOGIN_RESPONSE"
+    exit 1
+fi
+
+# ============================================
 # TEST 1: Validaciones de Persona
 # ============================================
 print_header "TEST 1: Validaciones de Persona"
 
 print_test "Crear persona sin nombre (debe fallar)"
 run_test
-RESPONSE=$(curl -s -X POST "$API_URL/personas" \
+RESPONSE=$(curl -s -b "$COOKIES_FILE" -X POST "$API_URL/personas" \
     -H "Content-Type: application/json" \
     -d '{"apellido":"Test","dni":"12345678"}')
 
@@ -66,7 +88,7 @@ fi
 
 print_test "Crear persona sin DNI (debe fallar)"
 run_test
-RESPONSE=$(curl -s -X POST "$API_URL/personas" \
+RESPONSE=$(curl -s -b "$COOKIES_FILE" -X POST "$API_URL/personas" \
     -H "Content-Type: application/json" \
     -d '{"nombre":"Test","apellido":"Apellido"}')
 
@@ -82,14 +104,14 @@ run_test
 DUP_DNI="DUP$(date +%s)"
 
 # First create
-curl -s -X POST "$API_URL/personas" \
+curl -s -b "$COOKIES_FILE" -X POST "$API_URL/personas" \
     -H "Content-Type: application/json" \
     -d "{\"nombre\":\"Original\",\"apellido\":\"Test\",\"dni\":\"${DUP_DNI}\"}" > /dev/null
 
 sleep 0.5
 
 # Try duplicate
-RESPONSE=$(curl -s -X POST "$API_URL/personas" \
+RESPONSE=$(curl -s -b "$COOKIES_FILE" -X POST "$API_URL/personas" \
     -H "Content-Type: application/json" \
     -d "{\"nombre\":\"Duplicado\",\"apellido\":\"Test\",\"dni\":\"${DUP_DNI}\"}")
 
@@ -106,7 +128,7 @@ print_header "TEST 2: Validaciones de Cobros"
 
 print_test "Cobrar sin persona_id (debe fallar)"
 run_test
-RESPONSE=$(curl -s -X POST "$API_URL/cobros/cuota-socio" \
+RESPONSE=$(curl -s -b "$COOKIES_FILE" -X POST "$API_URL/cobros/cuota-socio" \
     -H "Content-Type: application/json" \
     -d '{"cuota_ids":[1],"medio_pago":"efectivo"}')
 
@@ -118,7 +140,7 @@ fi
 
 print_test "Cobrar sin medio_pago (debe fallar)"
 run_test
-RESPONSE=$(curl -s -X POST "$API_URL/cobros/cuota-socio" \
+RESPONSE=$(curl -s -b "$COOKIES_FILE" -X POST "$API_URL/cobros/cuota-socio" \
     -H "Content-Type: application/json" \
     -d '{"persona_id":1,"cuota_ids":[1]}')
 
@@ -130,7 +152,7 @@ fi
 
 print_test "Cobrar con medio_pago inválido (debe fallar)"
 run_test
-RESPONSE=$(curl -s -X POST "$API_URL/cobros/cuota-socio" \
+RESPONSE=$(curl -s -b "$COOKIES_FILE" -X POST "$API_URL/cobros/cuota-socio" \
     -H "Content-Type: application/json" \
     -d '{"persona_id":1,"cuota_ids":[1],"medio_pago":"bitcoin"}')
 
@@ -149,7 +171,7 @@ print_test "Intentar cobrar cuota ya pagada (debe fallar)"
 run_test
 # Create test socio
 SOCIO_DNI="EDGETEST$(date +%s)"
-CREATE=$(curl -s -X POST "$API_URL/personas" \
+CREATE=$(curl -s -b "$COOKIES_FILE" -X POST "$API_URL/personas" \
     -H "Content-Type: application/json" \
     -d "{\"tipo\":\"socio\",\"nombre\":\"Edge\",\"apellido\":\"Test\",\"dni\":\"${SOCIO_DNI}\",\"generar_cuotas\":true}")
 
@@ -158,18 +180,18 @@ SOCIO_ID=$(echo "$CREATE" | grep -o '"id":[0-9]*' | grep -o '[0-9]*')
 if [ -n "$SOCIO_ID" ]; then
     sleep 1
     # Get first cuota
-    CUOTAS=$(curl -s "$API_URL/cobros/cuotas-pendientes/$SOCIO_ID")
+    CUOTAS=$(curl -s -b "$COOKIES_FILE" -H "X-WP-Nonce: $NONCE" "$API_URL/cobros/cuotas-pendientes/$SOCIO_ID")
     CUOTA_ID=$(echo "$CUOTAS" | grep -o '"id":"[0-9]*"' | head -1 | grep -o '[0-9]*')
 
     # Pay it once
-    curl -s -X POST "$API_URL/cobros/cuota-socio" \
+    curl -s -b "$COOKIES_FILE" -X POST "$API_URL/cobros/cuota-socio" \
         -H "Content-Type: application/json" \
         -d "{\"persona_id\":$SOCIO_ID,\"cuota_ids\":[$CUOTA_ID],\"medio_pago\":\"efectivo\"}" > /dev/null
 
     sleep 1
 
     # Try to pay again
-    RESPONSE=$(curl -s -X POST "$API_URL/cobros/cuota-socio" \
+    RESPONSE=$(curl -s -b "$COOKIES_FILE" -X POST "$API_URL/cobros/cuota-socio" \
         -H "Content-Type: application/json" \
         -d "{\"persona_id\":$SOCIO_ID,\"cuota_ids\":[$CUOTA_ID],\"medio_pago\":\"efectivo\"}")
 
@@ -198,7 +220,7 @@ fi
 
 print_test "Persona no existente (404)"
 run_test
-RESPONSE=$(curl -s "$API_URL/personas/999999")
+RESPONSE=$(curl -s -b "$COOKIES_FILE" -H "X-WP-Nonce: $NONCE" "$API_URL/personas/999999")
 if echo "$RESPONSE" | grep -q "no encontrad"; then
     print_success "Persona no existente retorna error apropiado"
 else

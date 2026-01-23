@@ -14,6 +14,7 @@ NC='\033[0m' # No Color
 # Base URL
 BASE_URL="http://localhost:10013"
 API_URL="${BASE_URL}/wp-json/cdc/v1"
+COOKIES_FILE="/tmp/cdc-test-cookies-suite.txt"
 
 # Counters
 TESTS_RUN=0
@@ -60,6 +61,9 @@ cleanup() {
     # Note: In production, you'd want to delete test records
     # For now, we'll leave them as they help verify the system works
 
+    # Clean up cookies
+    rm -f "$COOKIES_FILE"
+
     echo -e "${GREEN}Limpieza completada${NC}"
 }
 
@@ -72,6 +76,27 @@ print_header "🧪 CDC Sistema - Test Suite de Integración"
 echo "Base URL: $BASE_URL"
 echo "API URL: $API_URL"
 echo ""
+
+# ============================================
+# TEST 0: Autenticación (Login)
+# ============================================
+print_header "TEST 0: Autenticación"
+
+print_test "Login como admin para ejecutar tests"
+run_test
+LOGIN_RESPONSE=$(curl -s -c "$COOKIES_FILE" -X POST "$API_URL/auth/login" \
+    -H "Content-Type: application/json" \
+    -d '{"dni":"12345678"}')
+
+if echo "$LOGIN_RESPONSE" | grep -q '"success":true'; then
+    # Extract nonce for subsequent requests
+    NONCE=$(echo "$LOGIN_RESPONSE" | grep -o '"nonce":"[^"]*"' | cut -d'"' -f4)
+    print_success "Autenticación exitosa para tests (Nonce: ${NONCE:0:10}...)"
+else
+    echo -e "${RED}❌ ERROR: No se pudo autenticar. Los tests fallarán.${NC}"
+    echo "Response: $LOGIN_RESPONSE"
+    exit 1
+fi
 
 # ============================================
 # TEST 1: Verificar que WordPress está corriendo
@@ -87,9 +112,9 @@ else
     print_fail "WordPress no responde (HTTP $HTTP_CODE)" "TEST 1.1"
 fi
 
-print_test "Verificar que API REST está disponible"
+print_test "Verificar que API REST está disponible (autenticado)"
 run_test
-RESPONSE=$(curl -s "$API_URL/personas" -H "Content-Type: application/json")
+RESPONSE=$(curl -s -b "$COOKIES_FILE" -H "X-WP-Nonce: $NONCE" "$API_URL/personas" -H "Content-Type: application/json")
 if echo "$RESPONSE" | grep -q '"success"'; then
     print_success "API REST está disponible"
 else
@@ -106,7 +131,7 @@ RANDOM_DNI="TEST$(date +%s)"
 
 print_test "Crear persona (cliente)"
 run_test
-CREATE_RESPONSE=$(curl -s -X POST "$API_URL/personas" \
+CREATE_RESPONSE=$(curl -s -b "$COOKIES_FILE" -X POST "$API_URL/personas" \
     -H "Content-Type: application/json" \
     -d "{\"tipo\":\"cliente\",\"nombre\":\"Test\",\"apellido\":\"Cliente\",\"dni\":\"${RANDOM_DNI}\"}")
 
@@ -121,7 +146,7 @@ fi
 if [ -n "$PERSONA_ID" ]; then
     print_test "Obtener persona creada"
     run_test
-    GET_RESPONSE=$(curl -s "$API_URL/personas/$PERSONA_ID")
+    GET_RESPONSE=$(curl -s -b "$COOKIES_FILE" -H "X-WP-Nonce: $NONCE" "$API_URL/personas/$PERSONA_ID")
     if echo "$GET_RESPONSE" | grep -q '"success":true'; then
         print_success "Persona obtenida correctamente"
     else
@@ -138,7 +163,7 @@ SOCIO_DNI="SOCIO$(date +%s)"
 
 print_test "Crear socio con generación de cuotas"
 run_test
-SOCIO_RESPONSE=$(curl -s -X POST "$API_URL/personas" \
+SOCIO_RESPONSE=$(curl -s -b "$COOKIES_FILE" -X POST "$API_URL/personas" \
     -H "Content-Type: application/json" \
     -d "{\"tipo\":\"socio\",\"nombre\":\"Test\",\"apellido\":\"Socio\",\"dni\":\"${SOCIO_DNI}\",\"generar_cuotas\":true}")
 
@@ -154,7 +179,7 @@ if [ -n "$SOCIO_ID" ]; then
     print_test "Verificar generación de cuotas (12 meses)"
     run_test
     sleep 1  # Wait for cuotas to be created
-    CUOTAS_RESPONSE=$(curl -s "$API_URL/personas/$SOCIO_ID/cuotas?anio=$(date +%Y)")
+    CUOTAS_RESPONSE=$(curl -s -b "$COOKIES_FILE" -H "X-WP-Nonce: $NONCE" "$API_URL/personas/$SOCIO_ID/cuotas?anio=$(date +%Y)")
     CUOTAS_COUNT=$(echo "$CUOTAS_RESPONSE" | grep -o '"id":"[0-9]*"' | wc -l | tr -d ' ')
 
     if [ "$CUOTAS_COUNT" -eq 12 ]; then
@@ -172,7 +197,7 @@ print_header "TEST 4: Cobros y WooCommerce"
 if [ -n "$SOCIO_ID" ]; then
     print_test "Obtener cuotas pendientes del socio"
     run_test
-    PENDIENTES_RESPONSE=$(curl -s "$API_URL/cobros/cuotas-pendientes/$SOCIO_ID")
+    PENDIENTES_RESPONSE=$(curl -s -b "$COOKIES_FILE" -H "X-WP-Nonce: $NONCE" "$API_URL/cobros/cuotas-pendientes/$SOCIO_ID")
 
     if echo "$PENDIENTES_RESPONSE" | grep -q '"success":true'; then
         # Get first cuota ID
@@ -186,7 +211,7 @@ if [ -n "$SOCIO_ID" ]; then
     if [ -n "$FIRST_CUOTA_ID" ]; then
         print_test "Cobrar cuota socio (con WooCommerce)"
         run_test
-        COBRO_RESPONSE=$(curl -s -X POST "$API_URL/cobros/cuota-socio" \
+        COBRO_RESPONSE=$(curl -s -b "$COOKIES_FILE" -X POST "$API_URL/cobros/cuota-socio" \
             -H "Content-Type: application/json" \
             -d "{\"persona_id\":$SOCIO_ID,\"cuota_ids\":[$FIRST_CUOTA_ID],\"medio_pago\":\"efectivo\",\"observaciones\":\"Test automatico\"}")
 
@@ -211,7 +236,7 @@ if [ -n "$ORDER_ID" ]; then
     run_test
     sleep 2  # Wait for ARCA processing
 
-    ARCA_STATUS=$(curl -s "$API_URL/arca/status/$ORDER_ID")
+    ARCA_STATUS=$(curl -s -b "$COOKIES_FILE" -H "X-WP-Nonce: $NONCE" "$API_URL/arca/status/$ORDER_ID")
 
     if echo "$ARCA_STATUS" | grep -q '"factura_status":"ok"'; then
         COMPROBANTE=$(echo "$ARCA_STATUS" | grep -o '"comprobante_id":"[^"]*"' | cut -d'"' -f4)
@@ -236,7 +261,7 @@ print_header "TEST 6: Talleres y WooCommerce"
 
 print_test "Listar talleres"
 run_test
-TALLERES_RESPONSE=$(curl -s "$API_URL/talleres")
+TALLERES_RESPONSE=$(curl -s -b "$COOKIES_FILE" -H "X-WP-Nonce: $NONCE" "$API_URL/talleres")
 if echo "$TALLERES_RESPONSE" | grep -q '"success":true'; then
     TALLERES_COUNT=$(echo "$TALLERES_RESPONSE" | grep -o '"id":[0-9]*' | wc -l | tr -d ' ')
     print_success "Talleres listados correctamente (Total: $TALLERES_COUNT)"
@@ -246,7 +271,7 @@ fi
 
 print_test "Sincronizar talleres como productos WooCommerce"
 run_test
-SYNC_RESPONSE=$(curl -s -X POST "$API_URL/talleres/sync-wc-products" -H "Content-Type: application/json")
+SYNC_RESPONSE=$(curl -s -b "$COOKIES_FILE" -X POST "$API_URL/talleres/sync-wc-products" -H "Content-Type: application/json")
 if echo "$SYNC_RESPONSE" | grep -q '"success":true'; then
     SYNCED=$(echo "$SYNC_RESPONSE" | grep -o '"synced":[0-9]*' | grep -o '[0-9]*')
     print_success "Talleres sincronizados como productos WC (Total: $SYNCED)"
@@ -261,7 +286,7 @@ print_header "TEST 7: Búsqueda y Filtros"
 
 print_test "Buscar persona por query"
 run_test
-SEARCH_RESPONSE=$(curl -s "$API_URL/personas?query=Test")
+SEARCH_RESPONSE=$(curl -s -b "$COOKIES_FILE" -H "X-WP-Nonce: $NONCE" "$API_URL/personas?query=Test")
 if echo "$SEARCH_RESPONSE" | grep -q '"success":true'; then
     print_success "Búsqueda funciona correctamente"
 else
@@ -270,7 +295,7 @@ fi
 
 print_test "Filtrar por tipo (socios)"
 run_test
-FILTER_RESPONSE=$(curl -s "$API_URL/personas?tipo=socio")
+FILTER_RESPONSE=$(curl -s -b "$COOKIES_FILE" -H "X-WP-Nonce: $NONCE" "$API_URL/personas?tipo=socio")
 if echo "$FILTER_RESPONSE" | grep -q '"success":true'; then
     print_success "Filtro por tipo funciona correctamente"
 else
@@ -284,7 +309,7 @@ print_header "TEST 8: Movimientos de Caja"
 
 print_test "Listar movimientos de caja"
 run_test
-CAJA_RESPONSE=$(curl -s "$API_URL/caja/movimientos")
+CAJA_RESPONSE=$(curl -s -b "$COOKIES_FILE" -H "X-WP-Nonce: $NONCE" "$API_URL/caja/movimientos")
 if echo "$CAJA_RESPONSE" | grep -q '"success":true'; then
     print_success "Movimientos de caja obtenidos correctamente"
 else
@@ -293,7 +318,7 @@ fi
 
 print_test "Obtener balance actual"
 run_test
-BALANCE_RESPONSE=$(curl -s "$API_URL/caja/balance")
+BALANCE_RESPONSE=$(curl -s -b "$COOKIES_FILE" -H "X-WP-Nonce: $NONCE" "$API_URL/caja/balance")
 if echo "$BALANCE_RESPONSE" | grep -q '"success":true'; then
     BALANCE=$(echo "$BALANCE_RESPONSE" | grep -o '"balance":"[^"]*"' | cut -d'"' -f4)
     print_success "Balance obtenido: \$$BALANCE"
